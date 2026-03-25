@@ -2,22 +2,19 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <!DOCTYPE html>
-    <html xmlns:th="http://www.thymeleaf.org">
-    <head>
-        <title>Epicentral - Login</title>
-        <link rel="stylesheet" th:href="@{/css/estilos.css}">
-    </head>
-    <body class="login-container">
-    <div class="card">
-        <h2>EPICENTRAL</h2>
-        <p style="color: #64748b;">Ingeniería & Control TICs</p>
+    <title>Epicentral - Login</title>
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+</head>
+<body class="login-container">
+<div class="card">
+    <h2>EPICENTRAL</h2>
+    <p style="color: #64748b;">Ingeniería & Control TICs</p>
 
-        <form th:action="@{/login}" method="post">
-            <input type="text" name="username" placeholder="Correo electrónico" class="input-field" required>
-            <input type="password" name="password" placeholder="Contraseña" class="input-field" required>
-            <button type="submit" class="btn">ACCEDER AL PANEL</button>
-        </form>
-    </div>
-    </body>
-    </html>
+    <form th:action="@{/login}" method="post">
+        <input type="text" name="username" placeholder="Correo electrónico" class="input-field" required>
+        <input type="password" name="password" placeholder="Contraseña" class="input-field" required>
+        <button type="submit" class="btn">ACCEDER AL PANEL</button>
+    </form>
+</div>
+</body>
+</html>

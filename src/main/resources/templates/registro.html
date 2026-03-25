@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Epicentral | Nuevo Usuario</title>
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+</head>
+<body class="login-container">
+<div class="card" style="max-width: 500px;">
+    <h2>Nuevo Usuario</h2>
+    <form th:action="@{/registro}" th:object="${user}" method="post">
+        <input type="text" name="firstName" placeholder="Primer Nombre" class="input-field" required>
+        <input type="text" name="firstSurname" placeholder="Primer Apellido" class="input-field" required>
+        <input type="email" name="email" placeholder="Correo Electrónico" class="input-field" required>
+        <input type="password" name="password" placeholder="Contraseña Segura" class="input-field" required>
+        <button type="submit" class="btn">CREAR CUENTA</button>
+    </form>
+    <p style="margin-top: 15px;"><a href="/login" style="color: #64748b;">Volver al acceso</a></p>
+</div>
+</body>
+</html>
