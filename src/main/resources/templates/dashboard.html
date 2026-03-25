@@ -1,12 +1,48 @@
-<!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="UTF-8">
-  <title>Epicentral - Dashboard</title>
+  <title>Epicentral | Panel de Control</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="stylesheet" th:href="@{/css/estilos.css}">
 </head>
-<body style="font-family: sans-serif; padding: 50px;">
-<h1>¡Bienvenido a Epicentral! 🚀</h1>
-<p>Has iniciado sesión correctamente en el sistema de gestión TICs.</p>
-<a href="/logout">Cerrar Sesión</a>
+<body>
+<div class="main-wrapper">
+  <nav class="sidebar">
+    <div class="logo">
+      <h2>EPICENTRAL</h2>
+    </div>
+    <ul>
+      <li><a href="#"><i class="fas fa-home"></i> Inicio</a></li>
+      <li><a href="#"><i class="fas fa-video"></i> Cámaras/Cercos</a></li>
+      <li><a href="#"><i class="fas fa-tools"></i> Mantenimiento</a></li>
+      <li><a href="#"><i class="fas fa-boxes"></i> Inventario</a></li>
+      <li><a href="/logout" class="logout"><i class="fas fa-sign-out-alt"></i> Salir</a></li>
+    </ul>
+  </nav>
+
+  <main class="content">
+    <header class="top-bar">
+      <h1>Panel de Control</h1>
+      <div class="user-info">
+        <span>Admin: <strong>Jesús Álvarez</strong></span>
+      </div>
+    </header>
+
+    <div class="dashboard-grid">
+      <div class="widget">
+        <i class="fas fa-bell icon-bg"></i>
+        <h3>Notificaciones</h3>
+        <p>3 servicios de mantenimiento pendientes en el Valle de los Chillos.</p>
+      </div>
+      <div class="widget">
+        <i class="fas fa-shield-alt icon-bg"></i>
+        <h3>Seguridad TICs</h3>
+        <p>Sistemas de cámaras operando al 100%.</p>
+      </div>
+      <div class="widget">
+        <i class="fas fa-database icon-bg"></i>
+        <h3>Servidores GLP</h3>
+        <p>Estado de base de datos: <strong>Conectado</strong></p>
+      </div>
+    </div>
+  </main>
+</div>
 </body>
-</html>
