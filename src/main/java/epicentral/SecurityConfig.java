@@ -10,7 +10,6 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 public class SecurityConfig {
 
-    // 1. Añade este metodo para que Spring sepa cómo encriptar
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -20,11 +19,14 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
-                        // 2. Permitimos acceso a la página de registro y al CSS
-                        .requestMatchers("/css/**", "/registro").permitAll()
+                        .requestMatchers("/css/**", "/registro").permitAll() // Puerta abierta para estilos y registro
                         .anyRequest().authenticated()
                 )
-                .formLogin(form -> form.loginPage("/login").permitAll())
+                .formLogin(form -> form
+                        .loginPage("/login")
+                        .defaultSuccessUrl("/", true) // Al loguearte, vas directo al Dashboard
+                        .permitAll()
+                )
                 .logout(logout -> logout.permitAll());
         return http.build();
     }

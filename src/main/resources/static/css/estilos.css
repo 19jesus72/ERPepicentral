@@ -117,6 +117,23 @@ body {
     justify-content: space-between; align-items: center;
     box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 }
+/* Estilos para el submenú del Sidebar */
+.submenu {
+    list-style: none;
+    padding-left: 30px; /* Sangría para sub-ítems */
+    margin-top: 5px;
+    display: block; /* Por ahora siempre visible para facilitar el desarrollo */
+}
+
+.submenu li a {
+    font-size: 0.9rem;
+    padding: 8px 15px !important;
+    color: #94a3b8 !important;
+}
+
+.submenu li a:hover {
+    color: white !important;
+}
 
 /* Widgets con Iconos */
 .widget {

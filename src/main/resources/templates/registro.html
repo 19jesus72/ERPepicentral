@@ -1,20 +1,64 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Epicentral | Nuevo Usuario</title>
+    <title>Epicentral | Gestión de Usuarios</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/estilos.css}">
 </head>
-<body class="login-container">
-<div class="card" style="max-width: 500px;">
-    <h2>Nuevo Usuario</h2>
-    <form th:action="@{/registro}" th:object="${user}" method="post">
-        <input type="text" name="firstName" placeholder="Primer Nombre" class="input-field" required>
-        <input type="text" name="firstSurname" placeholder="Primer Apellido" class="input-field" required>
-        <input type="email" name="email" placeholder="Correo Electrónico" class="input-field" required>
-        <input type="password" name="password" placeholder="Contraseña Segura" class="input-field" required>
-        <button type="submit" class="btn">CREAR CUENTA</button>
-    </form>
-    <p style="margin-top: 15px;"><a href="/login" style="color: #64748b;">Volver al acceso</a></p>
+<body>
+<div class="main-wrapper">
+    <nav class="sidebar">
+        <div class="logo">
+            <h2>EPICENTRAL</h2>
+        </div>
+        <li>
+            <a href="#"><i class="fas fa-users"></i> Usuarios</a>
+            <ul class="submenu">
+                <li><a href="/usuarios/crear"><i class="fas fa-user-plus"></i> Creación</a></li>
+                <li><a href="/usuarios/actualizar"><i class="fas fa-user-edit"></i> Actualización</a></li>
+                <li><a href="/usuarios/permisos"><i class="fas fa-key"></i> Acceso Pantallas</a></li>
+                <li><a href="/usuarios/logs"><i class="fas fa-history"></i> Eventos y Logs</a></li>
+            </ul>
+        </li>
+    </nav>
+
+    <main class="content">
+        <header class="top-bar">
+            <h1>Gestión de Usuarios</h1>
+            <div class="user-info">
+                <span>Admin: <strong>Jesús Álvarez</strong></span>
+            </div>
+        </header>
+
+        <div class="dashboard-grid">
+            <div class="widget" style="grid-column: span 2;">
+                <i class="fas fa-user-cog icon-bg"></i>
+                <h3>Registrar Nuevo Colaborador</h3>
+                <p>Complete el formulario para dar de alta a técnicos o administradores en el sistema.</p>
+
+                <form th:action="@{/registro}" method="post" style="margin-top: 25px; max-width: 600px;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div>
+                            <label style="font-size: 0.85rem; font-weight: 700; color: #475569;">PRIMER NOMBRE</label>
+                            <input type="text" name="firstName" placeholder="Ej: Juan" class="input-field" required>
+                        </div>
+                        <div>
+                            <label style="font-size: 0.85rem; font-weight: 700; color: #475569;">PRIMER APELLIDO</label>
+                            <input type="text" name="firstSurname" placeholder="Ej: Pérez" class="input-field" required>
+                        </div>
+                    </div>
+
+                    <label style="font-size: 0.85rem; font-weight: 700; color: #475569;">CORREO ELECTRÓNICO</label>
+                    <input type="email" name="email" placeholder="tecnico@mastercontrol.com.ec" class="input-field" required>
+
+                    <label style="font-size: 0.85rem; font-weight: 700; color: #475569;">CONTRASEÑA TEMPORAL</label>
+                    <input type="password" name="password" placeholder="Mínimo 8 caracteres" class="input-field" required>
+
+                    <button type="submit" class="btn" style="margin-top: 10px;">GUARDAR EN BASE DE DATOS</button>
+                </form>
+            </div>
+        </div>
+    </main>
 </div>
 </body>
 </html>
