@@ -24,7 +24,7 @@ public class SecurityConfig {
                 )
                 .formLogin(form -> form
                         .loginPage("/login")
-                        .defaultSuccessUrl("/", true) // Al loguearte, vas directo al Dashboard
+                        .defaultSuccessUrl("/", true) // Esto te manda directo al inicio tras el login
                         .permitAll()
                 )
                 .logout(logout -> logout.permitAll());

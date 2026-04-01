@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Epicentral | Registro Maestro</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+</head>
+<body>
+<div class="main-wrapper">
+    <nav class="sidebar">
+        <div class="logo"><h2>EPICENTRAL</h2></div>
+        <ul>
+            <li><a href="/"><i class="fas fa-home"></i> Inicio</a></li>
+            <li><a href="#"><i class="fas fa-video"></i> Cámaras/Cercos</a></li>
+            <li><a href="#"><i class="fas fa-tools"></i> Mantenimiento</a></li>
+            <li><a href="#"><i class="fas fa-boxes"></i> Inventario</a></li>
+            <li>
+                <a href="#" style="background: #1e293b; color: white;"><i class="fas fa-users"></i> Usuarios</a>
+                <ul class="submenu">
+                    <li><a href="/usuarios/crear" style="color: white;"><i class="fas fa-user-plus"></i> Creación</a></li>
+                    <li><a href="/usuarios/actualizar"><i class="fas fa-user-edit"></i> Actualización</a></li>
+                </ul>
+            </li>
+            <li><a href="/logout" class="logout"><i class="fas fa-sign-out-alt"></i> Salir</a></li>
+        </ul>
+    </nav>
+
+    <main class="content">
+        <header class="top-bar">
+            <h1>Registro Maestro de Usuarios</h1>
+            <div class="user-info"><span>Módulo: <strong>Recursos Humanos / TICs</strong></span></div>
+        </header>
+
+        <div class="dashboard-grid">
+            <div class="widget" style="grid-column: span 3;">
+                <form th:action="@{/usuarios/guardar}" th:object="${user}" method="post">
+
+                    <div class="form-section">
+                        <h3 style="color: #1e293b;"><i class="fas fa-id-card"></i> Datos de Identificación</h3>
+                        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-top: 15px;">
+                            <input type="text" th:field="*{firstName}" placeholder="Primer Nombre" class="input-field" required>
+                            <input type="text" th:field="*{secondName}" placeholder="Segundo Nombre" class="input-field">
+                            <input type="text" th:field="*{firstSurname}" placeholder="Primer Apellido" class="input-field" required>
+                            <input type="text" th:field="*{secondSurname}" placeholder="Segundo Apellido" class="input-field">
+
+                            <select th:field="*{documentType}" class="input-field">
+                                <option value="Cedula">Cédula (Ecuador)</option>
+                                <option value="RUC">RUC</option>
+                                <option value="Pasaporte">Pasaporte</option>
+                            </select>
+                            <input type="text" th:field="*{documentNumber}" placeholder="No. Documento" class="input-field" required>
+                            <select th:field="*{gender}" class="input-field">
+                                <option value="Masculino">Masculino</option>
+                                <option value="Femenino">Femenino</option>
+                                <option value="Otro">Otro</option>
+                            </select>
+                            <input type="date" th:field="*{birthDate}" class="input-field" title="Fecha de Nacimiento">
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr 2fr; gap: 15px; margin-top: 10px;">
+                            <input type="text" th:field="*{nationality}" placeholder="Nacionalidad" class="input-field">
+                            <input type="text" th:field="*{city}" placeholder="Ciudad de Residencia" class="input-field">
+                            <input type="text" th:field="*{homeAddress}" placeholder="Dirección Domiciliaria Exacta" class="input-field">
+                        </div>
+                    </div>
+
+                    <hr style="margin: 25px 0; border: 0.5px solid #e2e8f0;">
+
+                    <div class="form-section">
+                        <h3 style="color: #1e293b;"><i class="fas fa-envelope-open-text"></i> Contacto y Credenciales</h3>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 15px; margin-top: 15px;">
+                            <input type="email" th:field="*{email}" placeholder="Correo Institucional" class="input-field" required>
+                            <input type="password" th:field="*{password}" placeholder="Contraseña de Acceso" class="input-field" required>
+                            <input type="text" th:field="*{primaryPhone}" placeholder="Celular Personal" class="input-field">
+                            <input type="text" th:field="*{secondaryPhone}" placeholder="Telf. Emergencia" class="input-field">
+                            <input type="text" th:field="*{emergencyKinship}" placeholder="Parentesco Emergencia" class="input-field" style="grid-column: span 1;">
+                        </div>
+                    </div>
+
+                    <hr style="margin: 25px 0; border: 0.5px solid #e2e8f0;">
+
+                    <div class="form-section">
+                        <h3 style="color: #c2410c;"><i class="fas fa-heartbeat"></i> Información de Salud</h3>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin-top: 15px;">
+                            <div class="health-card">
+                                <label>¿Posee Discapacidad?</label>
+                                <select th:field="*{hasDisability}" class="input-field">
+                                    <option value="false">No</option>
+                                    <option value="true">Sí</option>
+                                </select>
+                                <textarea th:field="*{disabilityDescription}" placeholder="Especifique tipo/porcentaje..." class="input-field" rows="2"></textarea>
+                            </div>
+                            <div class="health-card">
+                                <label>¿Enfermedad Crónica?</label>
+                                <select th:field="*{hasChronicIllness}" class="input-field">
+                                    <option value="false">No</option>
+                                    <option value="true">Sí</option>
+                                </select>
+                                <textarea th:field="*{chronicIllnessDescription}" placeholder="Nombre de la afección..." class="input-field" rows="2"></textarea>
+                            </div>
+                            <div class="health-card">
+                                <label>¿Alergias Conocidas?</label>
+                                <select th:field="*{hasAllergy}" class="input-field">
+                                    <option value="false">No</option>
+                                    <option value="true">Sí</option>
+                                </select>
+                                <textarea th:field="*{allergyDescription}" placeholder="Medicamentos, alimentos, etc..." class="input-field" rows="2"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 30px; text-align: right;">
+                        <button type="reset" class="btn" style="background: #94a3b8; margin-right: 10px;">LIMPIAR</button>
+                        <button type="submit" class="btn" style="width: auto; padding: 12px 60px;">
+                            <i class="fas fa-cloud-upload-alt"></i> GUARDAR COLABORADOR
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+</div>
+</body>
+</html>
