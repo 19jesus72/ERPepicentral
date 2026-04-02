@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
-
 import java.util.Collections;
 
 @Component
@@ -18,27 +17,29 @@ public class DataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        // Verificamos si ya existe el admin para no duplicarlo cada vez que inicies
-        if (userRepository.findByEmail("jesus-abo@hotmail.com").isEmpty()) {
+        // Se verifica si el usuario administrador ya existe para evitar duplicados
+        String adminEmail = "admin@epicentral.com";
+        if (userRepository.findByEmail(adminEmail).isEmpty()) {
 
             User admin = new User();
-            admin.setFirstName("Jesús");
-            admin.setFirstSurname("Álvarez");
-            admin.setEmail("jesus-abo@hotmail.com");
+            admin.setFirstName("Administrador");
+            admin.setFirstSurname("Sistema");
+            admin.setEmail(adminEmail);
 
-            // Encriptamos la contraseña "admin123" (Cámbiala luego)
-            admin.setPassword(passwordEncoder.encode("19728523"));
+            // Se utiliza el PasswordEncoder definido en SecurityConfig para encriptar la clave
+            //
+            admin.setPassword(passwordEncoder.encode("admin1234"));
 
-            // Le asignamos el rol de ADMIN que usaremos después
+            // Se asignan roles básicos
             admin.setRoles(Collections.singletonList("ADMIN"));
 
+            // Persistencia en la base de datos SQLite definida en application.properties
+            //
             userRepository.save(admin);
 
-            System.out.println("--------------------------------------");
-            System.out.println("SISTEMA: Usuario Admin creado con éxito");
-            System.out.println("Email: jesus-abo@hotmail.com");
-            System.out.println("Password: 19728523");
-            System.out.println("--------------------------------------");
+            System.out.println("SISTEMA: Usuario administrador inicial creado.");
+            System.out.println("Email: " + adminEmail);
+            System.out.println("Password: admin1234");
         }
     }
 }
