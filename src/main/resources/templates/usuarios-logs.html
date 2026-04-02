@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Epicentral | Auditoría de Eventos</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+</head>
+<body>
+<div class="main-wrapper">
+    <nav class="sidebar" th:replace="~{dashboard :: nav.sidebar}"></nav>
+
+    <main class="content">
+        <header class="top-bar">
+            <h1>Registro de Eventos y Logs</h1>
+            <div class="user-info"><span>Estado: <strong style="color: #16a34a;">Activo</strong></span></div>
+        </header>
+
+        <div class="dashboard-grid">
+            <div class="widget" style="grid-column: span 3;">
+                <p style="color: #64748b; margin-bottom: 20px;">Historial detallado de acciones realizadas por los administradores en el ERP.</p>
+
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                    <tr style="text-align: left; border-bottom: 2px solid #e2e8f0; color: #64748b;">
+                        <th style="padding: 12px;">FECHA Y HORA</th>
+                        <th style="padding: 12px;">USUARIO</th>
+                        <th style="padding: 12px;">ACCIÓN</th>
+                        <th style="padding: 12px;">DETALLES</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="log : ${logs}" style="border-bottom: 1px solid #f1f5f9;">
+                        <td style="padding: 12px; color: #1e3a8a; font-family: monospace;" th:text="${log.timestamp}"></td>
+                        <td style="padding: 12px; font-weight: 600;" th:text="${log.email}"></td>
+                        <td style="padding: 12px;">
+                                <span th:text="${log.action}"
+                                      th:style="${log.action == 'ELIMINACION' ? 'color: #dc2626; font-weight: bold;' : 'color: #16a34a; font-weight: bold;'}">
+                                </span>
+                        </td>
+                        <td style="padding: 12px; color: #475569;" th:text="${log.details}"></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+</div>
+</body>
+</html>

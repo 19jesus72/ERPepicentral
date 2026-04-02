@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Epicentral | Lista de Personal</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+</head>
+<body>
+<div class="main-wrapper">
+    <nav class="sidebar">
+        <div class="logo"><h2>EPICENTRAL</h2></div>
+        <ul>
+            <li><a href="/"><i class="fas fa-home"></i> Inicio</a></li>
+            <li>
+                <a href="#" style="background: #1e293b; color: white;"><i class="fas fa-users"></i> Usuarios</a>
+                <ul class="submenu">
+                    <li><a href="/usuarios/crear"><i class="fas fa-user-plus"></i> Creación</a></li>
+                    <li><a href="/usuarios/actualizar" style="color: white;"><i class="fas fa-user-edit"></i> Actualización</a></li>
+                </ul>
+            </li>
+            <li><a href="/logout" class="logout"><i class="fas fa-sign-out-alt"></i> Salir</a></li>
+        </ul>
+    </nav>
+
+    <main class="content">
+        <header class="top-bar">
+            <h1>Colaboradores Registrados</h1>
+            <div th:if="${param.editado}" style="color: #16a34a; font-weight: bold;">
+                <i class="fas fa-check-circle"></i> Usuario actualizado correctamente
+            </div>
+        </header>
+
+        <div th:if="${param.eliminado}" style="background: #fee2e2; color: #b91c1c; padding: 10px; border-radius: 5px; margin-bottom: 15px;">
+            <i class="fas fa-trash-alt"></i> Usuario eliminado correctamente.
+        </div>
+
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+            <tr style="text-align: left; border-bottom: 2px solid #e2e8f0; color: #64748b;">
+                <th style="padding: 12px;">NOMBRE</th>
+                <th style="padding: 12px;">CÉDULA/RUC</th>
+                <th style="padding: 12px;">EMAIL</th>
+                <th style="padding: 12px;">ACCIONES</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="u : ${usuarios}" style="border-bottom: 1px solid #f1f5f9;">
+                <td style="padding: 12px; font-weight: 600;" th:text="${u.firstName + ' ' + u.firstSurname}"></td>
+                <td style="padding: 12px;" th:text="${u.documentNumber}"></td>
+                <td style="padding: 12px;" th:text="${u.email}"></td>
+                <td style="padding: 12px; display: flex; gap: 8px;">
+                    <a th:href="@{/usuarios/editar/{id}(id=${u.id})}" class="btn" style="padding: 6px 12px; background: #0f172a; font-size: 0.75rem;">
+                        <i class="fas fa-user-edit"></i> EDITAR
+                    </a>
+                    <a th:href="@{/usuarios/eliminar/{id}(id=${u.id})}" class="btn"
+                       style="padding: 6px 12px; background: #dc2626; font-size: 0.75rem;"
+                       onclick="return confirm('¿Está seguro de dar de baja a este colaborador?')">
+                        <i class="fas fa-user-slash"></i> ELIMINAR
+                    </a>
+                </td>
+                <td style="padding: 6px; display: flex; gap: 12px;">
+                    <a th:href="@{/usuarios/permisos/{id}(id=${u.id})}" class="btn" style="padding: 6px 12px; background: #8b5cf6; font-size: 0.75rem;">
+                        <i class="fas fa-key"></i> PERMISOS
+                    </a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+            </div>
+        </div>
+    </main>
+</div>
+</body>
+</html>
