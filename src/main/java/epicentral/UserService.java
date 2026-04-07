@@ -13,8 +13,14 @@ public class UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    // En UserService.java
     public void registrarUsuario(User user) {
-        // Encriptamos la contraseña antes de guardar
+        // 1. Validar si el email ya existe
+        if (userRepository.findByEmail(user.getEmail()).isPresent()) {
+            throw new RuntimeException("El correo electrónico ya está registrado en el sistema.");
+        }
+
+        // 2. Si es nuevo, encriptar y guardar
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(user);
     }

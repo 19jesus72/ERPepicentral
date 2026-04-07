@@ -33,8 +33,26 @@
 
         <div class="dashboard-grid">
             <div class="widget" style="grid-column: span 3;">
+                <div th:if="${errorCorreo}" style="background: #fee2e2; color: #b91c1c; padding: 15px; border-radius: 8px; border-left: 5px solid #dc2626; margin-bottom: 25px;">
+                    <div style="display: flex; align-items: center;">
+                        <i class="fas fa-user-shield" style="font-size: 1.5rem; margin-right: 15px;"></i>
+                        <div>
+                            <strong style="display: block;">Error de Duplicidad</strong>
+                            <span th:text="${errorCorreo}" style="font-size: 0.9rem;"></span>
+                        </div>
+                    </div>
+                </div>
+                <div th:if="${errorCorreo or errorPassword}" style="margin-bottom: 25px;">
+                    <div th:if="${errorCorreo}" style="background: #fee2e2; color: #b91c1c; padding: 15px; border-radius: 8px; border-left: 5px solid #dc2626; margin-bottom: 10px;">
+                        <i class="fas fa-exclamation-triangle" style="margin-right: 10px;"></i>
+                        <span th:text="${errorCorreo}"></span>
+                    </div>
+                    <div th:if="${errorPassword}" style="background: #fff7ed; color: #9a3412; padding: 15px; border-radius: 8px; border-left: 5px solid #f97316;">
+                        <i class="fas fa-key" style="margin-right: 10px;"></i>
+                        <span th:text="${errorPassword}"></span>
+                    </div>
+                </div>
                 <form th:action="@{/usuarios/guardar}" th:object="${user}" method="post">
-
                     <div class="form-section">
                         <h3 style="color: #1e293b;"><i class="fas fa-id-card"></i> Datos de Identificación</h3>
                         <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-top: 15px;">

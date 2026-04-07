@@ -25,7 +25,19 @@ public class UsuarioController {
     }
 
     @PostMapping("/guardar")
-    public String guardarUsuario(@ModelAttribute("user") User user) {
+    public String guardarUsuario(@ModelAttribute("user") User user, Model model) {
+        // 1. Validación de Correo Duplicado en SQLite
+        if (userRepository.findByEmail(user.getEmail()).isPresent()) {
+            model.addAttribute("errorCorreo", "Este correo ya pertenece a un usuario registrado.");
+            return "usuarios-crear";
+        }
+
+        // 2. Validación de Seguridad: Mínimo 8 caracteres
+        if (user.getPassword() == null || user.getPassword().length() < 8) {
+            model.addAttribute("errorPassword", "La contraseña temporal debe tener al menos 8 caracteres.");
+            return "usuarios-crear";
+        }
+
         userService.registrarUsuario(user);
         return "redirect:/usuarios/actualizar?exito";
     }
