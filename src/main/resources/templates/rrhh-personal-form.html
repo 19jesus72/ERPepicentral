@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Epicentral | Ficha de Personal</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+</head>
+<body>
+<div class="main-wrapper">
+    <nav class="sidebar" th:replace="~{rrhh-panel :: nav.sidebar}"></nav>
+
+    <main class="content">
+        <header class="top-bar">
+            <h1>Ficha Técnica de Colaborador</h1>
+            <div class="user-info"><span>Módulo: <strong>Recursos Humanos</strong></span></div>
+        </header>
+
+        <div class="dashboard-grid">
+            <div class="widget" style="grid-column: span 3;">
+
+                <div th:if="${errorCorreo or errorPassword}" style="margin-bottom: 20px;">
+                    <div th:if="${errorCorreo}" style="background: #fee2e2; color: #b91c1c; padding: 12px; border-left: 4px solid #dc2626; margin-bottom: 10px;">
+                        <i class="fas fa-exclamation-triangle"></i> <span th:text="${errorCorreo}"></span>
+                    </div>
+                    <div th:if="${errorPassword}" style="background: #fff7ed; color: #9a3412; padding: 12px; border-left: 4px solid #f97316;">
+                        <i class="fas fa-key"></i> <span th:text="${errorPassword}"></span>
+                    </div>
+                </div>
+
+                <form th:action="@{/rrhh/personal/guardar}" th:object="${user}" method="post">
+
+                    <h3 style="color: var(--primary); border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;"><i class="fas fa-briefcase"></i> Perfil Corporativo</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-top: 15px; margin-bottom: 30px;">
+                        <input type="text" th:field="*{jobTitle}" placeholder="Cargo (Ej: Técnico Instalador)" class="input-field" required>
+                        <input type="text" th:field="*{department}" placeholder="Departamento" class="input-field" required>
+                        <input type="date" th:field="*{hireDate}" class="input-field" title="Fecha de Contratación" required>
+                    </div>
+
+                    <h3 style="color: var(--primary); border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;"><i class="fas fa-id-card"></i> Identificación y Contacto</h3>
+                    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-top: 15px; margin-bottom: 30px;">
+                        <input type="text" th:field="*{firstName}" placeholder="Primer Nombre" class="input-field" required>
+                        <input type="text" th:field="*{firstSurname}" placeholder="Primer Apellido" class="input-field" required>
+                        <input type="text" th:field="*{documentNumber}" placeholder="Cédula" class="input-field" required>
+                        <input type="email" th:field="*{email}" placeholder="Correo Institucional" class="input-field" required>
+                        <input type="text" th:field="*{primaryPhone}" placeholder="Teléfono Móvil" class="input-field">
+                        <input type="text" th:field="*{city}" placeholder="Ciudad" class="input-field" style="grid-column: span 3;">
+                    </div>
+
+                    <h3 style="color: var(--primary); border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;"><i class="fas fa-graduation-cap"></i> Desarrollo Profesional</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 15px; margin-bottom: 30px;">
+                        <div>
+                            <label style="font-weight: 600; color: #475569; font-size: 0.85rem;">Trayectoria Educativa / Certificaciones</label>
+                            <textarea th:field="*{educationHistory}" rows="3" class="input-field" placeholder="Títulos, cursos de GLP, normativas..."></textarea>
+                        </div>
+                        <div>
+                            <label style="font-weight: 600; color: #475569; font-size: 0.85rem;">Experiencia Laboral Previa</label>
+                            <textarea th:field="*{workHistory}" rows="3" class="input-field" placeholder="Empresas anteriores, roles desempeñados..."></textarea>
+                        </div>
+                        <div>
+                            <label style="font-weight: 600; color: #166534; font-size: 0.85rem;">Habilidades y Fortalezas Técnicas</label>
+                            <textarea th:field="*{skills}" rows="3" class="input-field" placeholder="Ej: Soldadura, Mantenimiento de Hardware..."></textarea>
+                        </div>
+                        <div>
+                            <label style="font-weight: 600; color: #9a3412; font-size: 0.85rem;">Áreas de Mejora / Limitaciones</label>
+                            <textarea th:field="*{weaknesses}" rows="3" class="input-field" placeholder="Ej: Requiere capacitación en redes..."></textarea>
+                        </div>
+                    </div>
+
+                    <div style="background: #f8fafc; padding: 20px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                        <h3 style="color: #0f172a; margin-top: 0;"><i class="fas fa-laptop-code"></i> Credenciales de Epicentral</h3>
+                        <p style="font-size: 0.85rem; color: #64748b;">Determine si este colaborador podrá iniciar sesión en el panel de administración.</p>
+
+                        <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 20px; align-items: center; margin-top: 15px;">
+                            <select th:field="*{hasSystemAccess}" class="input-field" style="margin: 0; font-weight: bold;">
+                                <option value="true">SÍ - Requiere Acceso</option>
+                                <option value="false">NO - Solo Personal de Campo</option>
+                            </select>
+
+                            <input type="password" th:field="*{password}" placeholder="Definir contraseña (Dejar en blanco si NO tiene acceso)" class="input-field" style="margin: 0;">
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 30px; text-align: right;">
+                        <a href="/rrhh/personal" class="btn" style="background: #94a3b8; text-decoration: none; padding: 12px 25px; margin-right: 10px;">CANCELAR</a>
+                        <button type="submit" class="btn" style="width: auto; padding: 12px 40px; background: var(--secondary);">
+                            <i class="fas fa-save"></i> GUARDAR COLABORADOR
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+</div>
+</body>
+</html>

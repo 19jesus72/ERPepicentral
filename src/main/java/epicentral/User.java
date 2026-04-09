@@ -58,6 +58,28 @@ public class User {
     private boolean hasAllergy;
     private String allergyDescription;
 
+    // --- DATOS DE RECURSOS HUMANOS (NUEVO) ---
+
+    @Column(nullable = false, columnDefinition = "boolean default true")
+    private Boolean hasSystemAccess = true; // ¿Se le permite iniciar sesión?
+
+    private String jobTitle; // Cargo (Ej: Técnico Instalador, Contador)
+    private String department; // Departamento (Ej: Operaciones, Administración)
+    private String hireDate; // Fecha de contratación
+
+    @Column(columnDefinition = "TEXT")
+    private String workHistory; // Trayectoria laboral previa
+
+    @Column(columnDefinition = "TEXT")
+    private String educationHistory; // Trayectoria educativa/títulos
+
+    @Column(columnDefinition = "TEXT")
+    private String skills; // Habilidades (Ej: Soldadura, Redes, Liderazgo)
+
+    @Column(columnDefinition = "TEXT")
+    private String weaknesses; // Áreas de mejora / Debilidades
+
+
     // --- SEGURIDAD Y PERMISOS (Lo que ya tenías) ---
     @ElementCollection(fetch = FetchType.EAGER)
     private List<String> roles;

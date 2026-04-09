@@ -11,36 +11,36 @@
 
     <main class="content">
         <header class="top-bar">
-            <h1>Permisos de Acceso: <span th:text="${user.firstName + ' ' + user.firstSurname}"></span></h1>
+            <h1>Gestión de Accesos: <span th:text="${user.firstName + ' ' + user.firstSurname}"></span></h1>
         </header>
 
         <div class="dashboard-grid">
             <div class="widget" style="grid-column: span 2;">
-                <p style="color: #64748b; margin-bottom: 25px;">Seleccione los módulos a los que este colaborador tendrá acceso visual en su panel.</p>
+                <p style="color: #64748b; margin-bottom: 25px;">Seleccione los módulos que estarán habilitados para este usuario en el panel principal.</p>
 
                 <form th:action="@{/usuarios/permisos/guardar}" method="post">
                     <input type="hidden" name="userId" th:value="${user.id}">
 
                     <div style="display: grid; gap: 15px;">
-                        <div th:each="modulo : ${todosLosModulos}"
-                             style="display: flex; align-items: center; padding: 15px; background: #f8fafc; border-radius: 8px; border: 1px solid #e2e8f0;">
+                        <<div th:each="modulo : ${todosLosModulos}"
+                              style="display: flex; align-items: center; padding: 15px; background: white; border-radius: 8px; border-left: 5px solid var(--secondary); box-shadow: 0 2px 4px rgba(0,0,0,0.05); margin-bottom: 10px;">
 
-                            <input type="checkbox" name="modulos" th:value="${modulo}"
-                                   th:checked="${user.functionalities.contains(modulo)}"
-                                   style="width: 20px; height: 20px; margin-right: 15px; cursor: pointer;">
+                        <input type="checkbox" name="modulos" th:value="${modulo}"
+                               th:checked="${user.functionalities.contains(modulo)}"
+                               style="width: 20px; height: 20px; margin-right: 15px; accent-color: var(--primary); cursor: pointer;">
 
-                            <div>
-                                <strong th:text="${modulo}" style="color: #1e3a8a; display: block;"></strong>
-                                <small style="color: #64748b;">Habilitar acceso a la pantalla de <span th:text="${modulo.toLowerCase()}"></span></small>
-                            </div>
+                        <div>
+                            <strong th:text="${modulo}" style="color: var(--primary); font-size: 1rem;"></strong>
+                            <p style="margin: 0; font-size: 0.85rem; color: #64748b;">Habilitar visibilidad del módulo en el dashboard.</p>
                         </div>
+                    </div>
                     </div>
 
                     <div style="margin-top: 30px;">
                         <button type="submit" class="btn" style="width: auto; padding: 12px 40px;">
-                            <i class="fas fa-shield-alt"></i> ACTUALIZAR PRIVILEGIOS
+                            <i class="fas fa-save"></i> GUARDAR CONFIGURACIÓN
                         </button>
-                        <a href="/usuarios/actualizar" style="margin-left: 15px; color: #64748b; text-decoration: none;">Cancelar</a>
+                        <a href="/usuarios/actualizar" style="margin-left: 15px; color: #64748b; text-decoration: none;">Regresar al listado</a>
                     </div>
                 </form>
             </div>

@@ -34,6 +34,21 @@
             <i class="fas fa-trash-alt"></i> Usuario eliminado correctamente.
         </div>
 
+        <form th:action="@{/usuarios/actualizar}" method="get" style="display: flex; gap: 10px; margin-bottom: 25px;">
+            <input type="text" name="keyword" th:value="${keyword}"
+                   placeholder="Buscar técnico por nombre, apellido o documento..."
+                   class="input-field"
+                   style="margin: 0; flex-grow: 1; max-width: 500px; border-color: var(--secondary);">
+
+            <button type="submit" class="btn" style="width: auto; padding: 10px 25px; background: var(--secondary);">
+                <i class="fas fa-search"></i> BUSCAR
+            </button>
+
+            <a th:href="@{/usuarios/actualizar}" class="btn" style="width: auto; padding: 10px 25px; background: #64748b; text-decoration: none; text-align: center;">
+                <i class="fas fa-times"></i> LIMPIAR
+            </a>
+        </form>
+
         <table style="width: 100%; border-collapse: collapse;">
             <thead>
             <tr style="text-align: left; border-bottom: 2px solid #e2e8f0; color: #64748b;">
@@ -49,7 +64,8 @@
                 <td style="padding: 12px;" th:text="${u.documentNumber}"></td>
                 <td style="padding: 12px;" th:text="${u.email}"></td>
                 <td style="padding: 12px; display: flex; gap: 8px;">
-                    <a th:href="@{/usuarios/editar/{id}(id=${u.id})}" class="btn" style="padding: 6px 12px; background: #0f172a; font-size: 0.75rem;">
+                    <a th:href="@{/usuarios/editar/{id}(id=${u.id})}" class="btn"
+                       style="padding: 6px 12px; background: #0f172a; font-size: 0.75rem;">
                         <i class="fas fa-user-edit"></i> EDITAR
                     </a>
                     <a th:href="@{/usuarios/eliminar/{id}(id=${u.id})}" class="btn"
@@ -58,11 +74,11 @@
                         <i class="fas fa-user-slash"></i> ELIMINAR
                     </a>
                 </td>
-                <td style="padding: 6px; display: flex; gap: 12px;">
-                    <a th:href="@{/usuarios/permisos/{id}(id=${u.id})}" class="btn" style="padding: 6px 12px; background: #8b5cf6; font-size: 0.75rem;">
-                        <i class="fas fa-key"></i> PERMISOS
+                <td style="padding: 12px; display: flex; gap: 8px;">
+                    <a th:href="@{/usuarios/permisos/{id}(id=${u.id})}" class="btn"
+                       style="padding: 6px 12px; background: var(--secondary); font-size: 0.75rem;">
+                        <i class="fas fa-shield-alt"></i> ACCESOS
                     </a>
-                </td>
             </tr>
             </tbody>
         </table>

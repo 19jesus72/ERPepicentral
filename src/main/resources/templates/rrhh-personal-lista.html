@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Epicentral | Directorio de Personal</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+</head>
+<body>
+<div class="main-wrapper">
+    <nav class="sidebar">
+        <div class="logo">
+            <h2>EPICENTRAL</h2>
+            <small style="color: #94a3b8; margin-left: 5px; font-weight: bold;">MÓDULO RRHH</small>
+        </div>
+        <ul style="margin-top: 20px;">
+            <li style="margin-bottom: 15px;"><a href="/" style="background: #1e293b;"><i class="fas fa-arrow-left"></i> Volver al Inicio</a></li>
+            <li><a href="/rrhh/panel"><i class="fas fa-home"></i> Panel General</a></li>
+            <li><a href="/rrhh/personal" style="background: var(--primary); color: white;"><i class="fas fa-users"></i> Personal</a></li>
+            <li><a href="#"><i class="fas fa-clock"></i> Registro de Horas</a></li>
+            <li><a href="#"><i class="fas fa-chart-line"></i> KPI y Rendimiento</a></li>
+        </ul>
+    </nav>
+
+    <main class="content">
+        <header class="top-bar">
+            <h1>Directorio de Colaboradores</h1>
+            <a href="/rrhh/personal/crear" class="btn" style="width: auto; background: var(--secondary);">
+                <i class="fas fa-user-plus"></i> NUEVO COLABORADOR
+            </a>
+        </header>
+
+        <div class="dashboard-grid">
+            <div class="widget" style="grid-column: span 3;">
+
+                <form th:action="@{/rrhh/personal}" method="get" style="display: flex; gap: 10px; margin-bottom: 25px;">
+                    <input type="text" name="keyword" th:value="${keyword}" placeholder="Buscar por nombre o cédula..." class="input-field" style="margin: 0; flex-grow: 1; max-width: 500px;">
+                    <button type="submit" class="btn" style="width: auto; padding: 10px 25px;"><i class="fas fa-search"></i> Buscar</button>
+                    <a th:href="@{/rrhh/personal}" class="btn" style="width: auto; padding: 10px 25px; background: #64748b; text-decoration: none;"><i class="fas fa-times"></i> Limpiar</a>
+                </form>
+
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                    <tr style="text-align: left; border-bottom: 2px solid #e2e8f0; color: #64748b;">
+                        <th style="padding: 12px;">COLABORADOR</th>
+                        <th style="padding: 12px;">CARGO / DPTO.</th>
+                        <th style="padding: 12px;">ACCESO AL SISTEMA</th>
+                        <th style="padding: 12px;">ACCIONES RRHH</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="p : ${personal}" style="border-bottom: 1px solid #f1f5f9;">
+                        <td style="padding: 12px;">
+                            <strong th:text="${p.firstName + ' ' + p.firstSurname}" style="color: #1e3a8a; display: block;"></strong>
+                            <small th:text="${p.documentNumber}" style="color: #64748b;"></small>
+                        </td>
+                        <td style="padding: 12px;">
+                            <span th:text="${p.jobTitle != null ? p.jobTitle : 'No asignado'}" style="display: block; font-weight: 500;"></span>
+                            <small th:text="${p.department != null ? p.department : '-'}" style="color: #64748b;"></small>
+                        </td>
+                        <td style="padding: 12px;">
+                            <span th:if="${p.hasSystemAccess}" style="background: #dcfce7; color: #166534; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: bold;"><i class="fas fa-check"></i> HABILITADO</span>
+                            <span th:unless="${p.hasSystemAccess}" style="background: #f1f5f9; color: #475569; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: bold;"><i class="fas fa-ban"></i> SIN ACCESO</span>
+                        </td>
+                        <td style="padding: 12px; display: flex; gap: 8px;">
+                            <a href="#" class="btn" style="padding: 6px 12px; background: #0f172a; font-size: 0.75rem;"><i class="fas fa-id-badge"></i> PERFIL COMPLETO</a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+</div>
+</body>
+</html>

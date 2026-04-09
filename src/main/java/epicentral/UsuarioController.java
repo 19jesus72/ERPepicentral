@@ -42,10 +42,20 @@ public class UsuarioController {
         return "redirect:/usuarios/actualizar?exito";
     }
 
-    // 2. PANTALLA DE LISTADO Y ACTUALIZACIÓN
+    // 2. PANTALLA DE LISTADO Y ACTUALIZACIÓN Y BÚSQUEDA
     @GetMapping("/actualizar")
-    public String listarUsuarios(Model model) {
-        List<User> listaUsuarios = userRepository.findAll();
+    public String listarUsuarios(Model model, @RequestParam(value = "keyword", required = false) String keyword) {
+        List<User> listaUsuarios;
+
+        // Si hay una palabra clave, usamos el buscador
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            listaUsuarios = userRepository.searchUsers(keyword);
+            model.addAttribute("keyword", keyword); // Retornamos la palabra para que se quede en la barra
+        } else {
+            // Si no hay búsqueda, traemos todos los registros
+            listaUsuarios = userRepository.findAll();
+        }
+
         model.addAttribute("usuarios", listaUsuarios);
         return "usuarios-lista";
     }
@@ -81,13 +91,13 @@ public class UsuarioController {
     // 5. OTROS APARTADOS
     // En UsuarioController.java
 
-    // 1. Mostrar pantalla de permisos para un usuario específico
+    // 1. Cargar la pantalla de permisos para un usuario específico
     @GetMapping("/permisos/{id}")
     public String gestionarPermisos(@PathVariable("id") Long id, Model model) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("ID inválido:" + id));
+                .orElseThrow(() -> new IllegalArgumentException("ID de usuario inválido:" + id));
 
-        // Lista de módulos disponibles en el ERP Epicentral
+        // Lista maestra de módulos existentes en tu ERP
         List<String> todosLosModulos = List.of("DASHBOARD", "CAMARAS", "MANTENIMIENTO", "INVENTARIO", "USUARIOS");
 
         model.addAttribute("user", user);
@@ -95,16 +105,20 @@ public class UsuarioController {
         return "usuarios-permisos";
     }
 
-    // 2. Guardar los permisos seleccionados
+    // 2. Guardar la selección de módulos
     @PostMapping("/permisos/guardar")
     public String guardarPermisos(@RequestParam("userId") Long userId,
                                   @RequestParam(value = "modulos", required = false) List<String> modulos) {
         User user = userRepository.findById(userId).get();
 
-        // Si no se selecciona nada, enviamos lista vacía para evitar errores
+        // Si no se selecciona ningún módulo, se inicializa una lista vacía
         user.setFunctionalities(modulos != null ? modulos : new java.util.ArrayList<>());
 
         userRepository.save(user);
+
+        // Registrar la acción en los logs (opcional, si ya integraste LogRepository)
+        // logRepository.save(new LogEntry("admin@epicentral.com", "PERMISOS", "Se actualizaron accesos para: " + user.getEmail()));
+
         return "redirect:/usuarios/actualizar?permisos_actualizados";
     }
 
@@ -119,5 +133,6 @@ public class UsuarioController {
     }
 
     // Ejemplo de cómo registrar una eliminación (haz algo similar en guardar y actualizar)
+    // En UsuarioController.java
 
 }
