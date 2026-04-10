@@ -3,9 +3,8 @@ package epicentral;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+// 👇 ESTA LÍNEA CON EL ASTERISCO SOLUCIONA EL ERROR 👇
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -15,6 +14,9 @@ public class RRHHController {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private UserService userService;
 
     // Panel General
     @GetMapping("/panel")
@@ -27,7 +29,7 @@ public class RRHHController {
     public String listarPersonal(Model model, @RequestParam(value = "keyword", required = false) String keyword) {
         List<User> personal;
 
-        // Reutilizamos tu buscador inteligente
+        // Buscador inteligente
         if (keyword != null && !keyword.trim().isEmpty()) {
             personal = userRepository.searchUsers(keyword);
             model.addAttribute("keyword", keyword);
@@ -38,15 +40,15 @@ public class RRHHController {
         model.addAttribute("personal", personal);
         return "rrhh-personal-lista";
     }
-    @Autowired
-    private UserService userService;
 
+    // Mostrar formulario de creación (Mega-Ficha)
     @GetMapping("/personal/crear")
     public String mostrarFormularioPersonal(Model model) {
         model.addAttribute("user", new User());
         return "rrhh-personal-form";
     }
 
+    // Guardar los datos del colaborador
     @PostMapping("/personal/guardar")
     public String guardarPersonal(@ModelAttribute("user") User user, Model model) {
         // Validación de correo único
@@ -57,10 +59,10 @@ public class RRHHController {
 
         // Lógica de Acceso al Sistema
         if (user.getHasSystemAccess() != null && !user.getHasSystemAccess()) {
-            // Si no tiene acceso, generamos una clave interna de 16 caracteres para cumplir con SQLite
+            // Generamos una clave interna temporal para cumplir con SQLite
             user.setPassword(java.util.UUID.randomUUID().toString().substring(0, 16));
         } else if (user.getPassword() == null || user.getPassword().length() < 8) {
-            // Si tiene acceso, validamos que la clave sea segura
+            // Validamos que la clave sea segura
             model.addAttribute("errorPassword", "La contraseña de acceso debe tener al menos 8 caracteres.");
             return "rrhh-personal-form";
         }
