@@ -148,4 +148,28 @@ public class User {
     public void setRoles(List<String> roles) { this.roles = roles; }
     public List<String> getFunctionalities() { return functionalities; }
     public void setFunctionalities(List<String> functionalities) { this.functionalities = functionalities; }
+
+    public Boolean getHasSystemAccess() { return hasSystemAccess; }
+    public void setHasSystemAccess(Boolean hasSystemAccess) { this.hasSystemAccess = hasSystemAccess; }
+
+    public String getJobTitle() { return jobTitle; }
+    public void setJobTitle(String jobTitle) { this.jobTitle = jobTitle; }
+
+    public String getDepartment() { return department; }
+    public void setDepartment(String department) { this.department = department; }
+
+    public String getHireDate() { return hireDate; }
+    public void setHireDate(String hireDate) { this.hireDate = hireDate; }
+
+    public String getWorkHistory() { return workHistory; }
+    public void setWorkHistory(String workHistory) { this.workHistory = workHistory; }
+
+    public String getEducationHistory() { return educationHistory; }
+    public void setEducationHistory(String educationHistory) { this.educationHistory = educationHistory; }
+
+    public String getSkills() { return skills; }
+    public void setSkills(String skills) { this.skills = skills; }
+
+    public String getWeaknesses() { return weaknesses; }
+    public void setWeaknesses(String weaknesses) { this.weaknesses = weaknesses; }
 }
