@@ -18,7 +18,7 @@
         <div class="dashboard-grid">
             <div class="widget" style="grid-column: span 3;">
 
-                <div th:if="${errorCorreo or errorPassword}" style="margin-bottom: 20px;">
+                <div th:if="${errorCorreo != null or errorPassword != null}" style="margin-bottom: 25px;">
                     <div th:if="${errorCorreo}" style="background: #fee2e2; color: #b91c1c; padding: 12px; border-left: 4px solid #dc2626; margin-bottom: 10px;">
                         <i class="fas fa-exclamation-triangle"></i> <span th:text="${errorCorreo}"></span>
                     </div>
