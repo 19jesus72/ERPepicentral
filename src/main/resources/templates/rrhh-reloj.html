@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Epicentral | Reloj de Fichaje</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+    <style>
+        .digital-clock {
+            font-size: 4rem;
+            font-weight: 800;
+            color: var(--primary);
+            font-family: monospace;
+            text-align: center;
+            margin: 20px 0;
+            letter-spacing: 5px;
+        }
+        .status-badge {
+            display: inline-block; padding: 8px 16px; border-radius: 20px; font-weight: bold; font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body onload="iniciarReloj()">
+<div class="main-wrapper">
+    <nav class="sidebar" th:replace="~{dashboard :: sidebar}"></nav>
+
+    <main class="content">
+        <header class="top-bar">
+            <h1>Control de Jornada Laboral</h1>
+            <div class="user-info">
+                <span style="color: #64748b;">Fecha: <strong th:text="${#temporals.format(#temporals.createNow(), 'dd/MM/yyyy')}"></strong></span>
+            </div>
+        </header>
+
+        <div class="dashboard-grid">
+
+            <div class="widget" style="grid-column: span 2; display: flex; flex-direction: column; align-items: center; justify-content: center; background: white; border-top: 5px solid var(--secondary);">
+                <h3 style="color: #64748b; margin: 0;">HORA ACTUAL (ECUADOR)</h3>
+                <div id="reloj" class="digital-clock">00:00:00</div>
+
+                <div th:if="${registro.status == null}" class="status-badge" style="background: #f1f5f9; color: #64748b;">
+                    <i class="fas fa-bed"></i> FUERA DE TURNO
+                </div>
+                <div th:if="${registro.status == 'TRABAJANDO'}" class="status-badge" style="background: #dcfce7; color: #166534;">
+                    <i class="fas fa-briefcase"></i> TRABAJANDO
+                </div>
+                <div th:if="${registro.status == 'EN PAUSA'}" class="status-badge" style="background: #fef08a; color: #854d0e;">
+                    <i class="fas fa-coffee"></i> EN PAUSA (ALMUERZO)
+                </div>
+                <div th:if="${registro.status == 'FINALIZADO'}" class="status-badge" style="background: #fee2e2; color: #b91c1c;">
+                    <i class="fas fa-check-double"></i> JORNADA FINALIZADA
+                </div>
+            </div>
+
+            <div class="widget">
+                <h3 style="color: var(--primary); margin-top: 0; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;">
+                    <i class="fas fa-stopwatch"></i> Acciones de Fichaje
+                </h3>
+
+                <form th:if="${registro.status == null}" th:action="@{/rrhh/reloj/accion}" method="post">
+                    <input type="hidden" name="accion" value="ENTRADA">
+                    <div style="margin-bottom: 15px;">
+                        <label style="font-size: 0.8rem; font-weight: bold; color: #475569;">Ubicación Actual</label>
+                        <input type="text" name="locationMode" class="input-field" placeholder="Ej: Oficina Central Quito, Sector Valle de los Chillos..." required style="margin-bottom: 5px;">
+                    </div>
+                    <div style="margin-bottom: 15px;">
+                        <label style="font-size: 0.8rem; font-weight: bold; color: #475569;">Proyecto / Tarea Asignada</label>
+                        <input type="text" name="assignedProject" class="input-field" placeholder="Ej: Redes TP-Link, Mantenimiento GLP Granja..." required style="margin-bottom: 5px;">
+                    </div>
+                    <button type="submit" class="btn" style="width: 100%; padding: 12px; background: #16a34a;">
+                        <i class="fas fa-sign-in-alt"></i> REGISTRAR ENTRADA
+                    </button>
+                </form>
+
+                <form th:if="${registro.status == 'TRABAJANDO'}" th:action="@{/rrhh/reloj/accion}" method="post" style="margin-bottom: 15px;">
+                    <input type="hidden" name="accion" value="PAUSA_INICIO">
+                    <button type="submit" class="btn" style="width: 100%; padding: 12px; background: #eab308; color: black;">
+                        <i class="fas fa-utensils"></i> INICIAR PAUSA ALMUERZO
+                    </button>
+                </form>
+
+                <form th:if="${registro.status == 'EN PAUSA'}" th:action="@{/rrhh/reloj/accion}" method="post" style="margin-bottom: 15px;">
+                    <input type="hidden" name="accion" value="PAUSA_FIN">
+                    <button type="submit" class="btn" style="width: 100%; padding: 12px; background: var(--secondary);">
+                        <i class="fas fa-play"></i> REANUDAR JORNADA
+                    </button>
+                </form>
+
+                <form th:if="${registro.status == 'TRABAJANDO'}" th:action="@{/rrhh/reloj/accion}" method="post">
+                    <input type="hidden" name="accion" value="SALIDA">
+                    <div style="margin-bottom: 15px;">
+                        <label style="font-size: 0.8rem; font-weight: bold; color: #475569;">Reporte Breve de Actividades</label>
+                        <textarea name="notes" class="input-field" rows="3" placeholder="Resumen de labores realizadas, novedades en el servidor ClearOS, equipos Hikvision configurados..." style="margin-bottom: 5px;"></textarea>
+                    </div>
+                    <button type="submit" class="btn" style="width: 100%; padding: 12px; background: #dc2626;" onclick="return confirm('¿Seguro que desea finalizar la jornada de hoy?')">
+                        <i class="fas fa-sign-out-alt"></i> FINALIZAR JORNADA
+                    </button>
+                </form>
+
+                <div th:if="${registro.status == 'FINALIZADO'}" style="text-align: center; color: #64748b; padding: 20px;">
+                    <i class="fas fa-clipboard-check" style="font-size: 2rem; color: #16a34a; margin-bottom: 10px;"></i>
+                    <p>Tu jornada ha sido registrada exitosamente en el sistema. Los reportes han sido guardados.</p>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script>
+    function iniciarReloj() {
+        const hoy = new Date();
+        let h = hoy.getHours();
+        let m = hoy.getMinutes();
+        let s = hoy.getSeconds();
+        m = chequearTiempo(m);
+        s = chequearTiempo(s);
+        document.getElementById('reloj').innerHTML = h + ":" + m + ":" + s;
+        setTimeout(iniciarReloj, 1000);
+    }
+    function chequearTiempo(i) {
+        if (i < 10) { i = "0" + i };  // Añade un cero delante de números menores a 10
+        return i;
+    }
+</script>
+</body>
+</html>

@@ -3,8 +3,11 @@ package epicentral;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-// 👇 ESTA LÍNEA CON EL ASTERISCO SOLUCIONA EL ERROR 👇
 import org.springframework.web.bind.annotation.*;
+import java.security.Principal;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.Optional;
 
 import java.util.List;
 
@@ -17,6 +20,9 @@ public class RRHHController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private TimeRecordRepository timeRecordRepository;
 
     // Panel General
     @GetMapping("/panel")
@@ -70,4 +76,92 @@ public class RRHHController {
         userService.registrarUsuario(user);
         return "redirect:/rrhh/personal?exito";
     }
+
+    @GetMapping("/reloj")
+    public String mostrarReloj(Model model, Principal principal) {
+        // Obtenemos al usuario que tiene la sesión activa
+        User currentUser = userRepository.findByEmail(principal.getName()).get();
+
+        // Buscamos si ya tiene un registro creado el día de hoy
+        Optional<TimeRecord> recordHoy = timeRecordRepository.findByUserAndWorkDate(currentUser, LocalDate.now());
+
+        if (recordHoy.isPresent()) {
+            model.addAttribute("registro", recordHoy.get());
+        } else {
+            // Si no ha fichado, enviamos un registro vacío para la plantilla
+            model.addAttribute("registro", new TimeRecord());
+        }
+
+        return "rrhh-reloj";
+    }
+
+    @PostMapping("/reloj/accion")
+    public String procesarFichaje(@RequestParam("accion") String accion,
+                                  @RequestParam(value = "locationMode", required = false) String locationMode,
+                                  @RequestParam(value = "assignedProject", required = false) String assignedProject,
+                                  @RequestParam(value = "notes", required = false) String notes,
+                                  Principal principal) {
+
+        User currentUser = userRepository.findByEmail(principal.getName()).get();
+        LocalDate hoy = LocalDate.now();
+        LocalTime ahora = LocalTime.now();
+
+        // Recuperamos el registro de hoy, o creamos uno nuevo si es la primera acción (Entrada)
+        TimeRecord registro = timeRecordRepository.findByUserAndWorkDate(currentUser, hoy)
+                .orElse(new TimeRecord());
+
+        if (registro.getUser() == null) {
+            registro.setUser(currentUser);
+            registro.setWorkDate(hoy);
+        }
+
+        // Máquina de estados para el reloj
+        switch (accion) {
+            case "ENTRADA":
+                registro.setClockInTime(ahora);
+                registro.setLocationMode(locationMode);
+                registro.setAssignedProject(assignedProject);
+                registro.setStatus("TRABAJANDO");
+                break;
+            case "PAUSA_INICIO":
+                registro.setPauseStartTime(ahora);
+                registro.setStatus("EN PAUSA");
+                break;
+            case "PAUSA_FIN":
+                registro.setPauseEndTime(ahora);
+                registro.setStatus("TRABAJANDO");
+                break;
+            case "SALIDA":
+                registro.setClockOutTime(ahora);
+                registro.setNotes(notes);
+                registro.setStatus("FINALIZADO");
+                break;
+        }
+
+        timeRecordRepository.save(registro);
+        return "redirect:/rrhh/reloj";
+    }
+
+    // ---------------------------------------------------------
+    // HOJA DE TIEMPOS (TIMESHEET PARA ADMINISTRADORES)
+    // ---------------------------------------------------------
+
+    @GetMapping("/timesheet")
+    public String verTimesheet(Model model, @RequestParam(value = "keyword", required = false) String keyword) {
+        List<TimeRecord> registros;
+
+        // Si el administrador busca un proyecto específico
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            registros = timeRecordRepository.findByAssignedProjectContainingIgnoreCase(keyword);
+            model.addAttribute("keyword", keyword);
+        } else {
+            // Mostrar todo el historial ordenado por fecha
+            registros = timeRecordRepository.findAllByOrderByWorkDateDesc();
+        }
+
+        model.addAttribute("registros", registros);
+        return "rrhh-timesheet";
+    }
+
+
 }

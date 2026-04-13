@@ -7,24 +7,7 @@
 </head>
 <body>
 <div class="main-wrapper">
-    <nav class="sidebar">
-        <div class="logo"><h2>EPICENTRAL</h2></div>
-        <ul>
-            <li><a href="/"><i class="fas fa-home"></i> Inicio</a></li>
-            <li><a href="#"><i class="fas fa-video"></i> Cámaras/Cercos</a></li>
-            <li><a href="#"><i class="fas fa-tools"></i> Mantenimiento</a></li>
-            <li><a href="#"><i class="fas fa-boxes"></i> Inventario</a></li>
-            <li>
-                <a href="#" style="background: #1e293b; color: white;"><i class="fas fa-users"></i> Usuarios</a>
-                <ul class="submenu">
-                    <li><a href="/usuarios/crear" style="color: white;"><i class="fas fa-user-plus"></i> Creación</a></li>
-                    <li><a href="/usuarios/actualizar"><i class="fas fa-user-edit"></i> Actualización</a></li>
-                </ul>
-            </li>
-            <li><a href="/logout" class="logout"><i class="fas fa-sign-out-alt"></i> Salir</a></li>
-        </ul>
-    </nav>
-
+    <nav class="sidebar" th:replace="~{dashboard :: sidebar}"></nav>
     <main class="content">
         <header class="top-bar">
             <h1>Edición de Perfil de Colaborador</h1>
