@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Epicentral | Gestión de Permisos</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+</head>
+<body>
+<div class="main-wrapper">
+    <nav class="sidebar" th:replace="~{dashboard :: sidebar}"></nav>
+
+    <main class="content">
+        <header class="top-bar">
+            <h1>Control de Permisos y Ausencias</h1>
+            <div class="user-info"><span>Módulo: <strong>Recursos Humanos</strong></span></div>
+        </header>
+
+        <div class="dashboard-grid">
+
+            <div class="widget" style="grid-column: span 1; height: fit-content;">
+                <h3 style="color: var(--primary); margin-top: 0; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;">
+                    <i class="fas fa-notes-medical"></i> Registrar Ausencia
+                </h3>
+
+                <form th:action="@{/rrhh/permisos/guardar}" method="post">
+                    <div style="margin-bottom: 15px;">
+                        <label style="font-size: 0.8rem; font-weight: bold; color: #475569;">Colaborador</label>
+                        <select name="userId" class="input-field" required>
+                            <option value="" disabled selected>Seleccione al empleado...</option>
+                            <option th:each="emp : ${empleados}" th:value="${emp.id}" th:text="${emp.firstName + ' ' + emp.firstSurname}"></option>
+                        </select>
+                    </div>
+
+                    <div style="margin-bottom: 15px;">
+                        <label style="font-size: 0.8rem; font-weight: bold; color: #475569;">Tipo de Permiso</label>
+                        <select name="absenceType" class="input-field" required>
+                            <option value="Enfermedad">Enfermedad / Cita Médica</option>
+                            <option value="Vacaciones">Vacaciones Anuales</option>
+                            <option value="Calamidad Doméstica">Calamidad Doméstica</option>
+                            <option value="Permiso Personal">Permiso Personal (No Remunerado)</option>
+                        </select>
+                    </div>
+
+                    <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                        <div style="flex: 1;">
+                            <label style="font-size: 0.8rem; font-weight: bold; color: #475569;">Desde</label>
+                            <input type="date" name="startDate" class="input-field" required>
+                        </div>
+                        <div style="flex: 1;">
+                            <label style="font-size: 0.8rem; font-weight: bold; color: #475569;">Hasta</label>
+                            <input type="date" name="endDate" class="input-field" required>
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 15px;">
+                        <label style="font-size: 0.8rem; font-weight: bold; color: #475569;">Motivo / Justificación</label>
+                        <textarea name="reason" class="input-field" rows="3" placeholder="Detalle la razón de la ausencia..."></textarea>
+                    </div>
+
+                    <button type="submit" class="btn" style="width: 100%; background: var(--secondary);">
+                        <i class="fas fa-save"></i> REGISTRAR SOLICITUD
+                    </button>
+                </form>
+            </div>
+
+            <div class="widget" style="grid-column: span 2;">
+                <h3 style="color: var(--primary); margin-top: 0; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;">
+                    <i class="fas fa-tasks"></i> Historial y Aprobaciones
+                </h3>
+
+                <table style="width: 100%; border-collapse: collapse; margin-top: 15px;">
+                    <thead>
+                    <tr style="text-align: left; border-bottom: 2px solid #e2e8f0; color: #64748b; background: #f8fafc;">
+                        <th style="padding: 12px;">COLABORADOR</th>
+                        <th style="padding: 12px;">TIPO Y FECHAS</th>
+                        <th style="padding: 12px;">ESTADO</th>
+                        <th style="padding: 12px;">ACCIÓN RRHH</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="sol : ${solicitudes}" style="border-bottom: 1px solid #f1f5f9;">
+                        <td style="padding: 12px;">
+                            <strong th:text="${sol.user.firstName + ' ' + sol.user.firstSurname}" style="color: #1e3a8a; display: block;"></strong>
+                            <small th:text="${sol.reason}" style="color: #64748b;"></small>
+                        </td>
+                        <td style="padding: 12px;">
+                            <span th:text="${sol.absenceType}" style="display: block; font-weight: bold;"></span>
+                            <small th:text="${sol.startDate + ' al ' + sol.endDate}" style="color: #94a3b8;"></small>
+                        </td>
+                        <td style="padding: 12px;">
+                            <span th:if="${sol.status == 'PENDIENTE'}" style="background: #fef08a; color: #854d0e; padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold;">PENDIENTE</span>
+                            <span th:if="${sol.status == 'APROBADO'}" style="background: #dcfce7; color: #166534; padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold;">APROBADO</span>
+                            <span th:if="${sol.status == 'RECHAZADO'}" style="background: #fee2e2; color: #b91c1c; padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold;">RECHAZADO</span>
+                        </td>
+                        <td style="padding: 12px;">
+                            <div th:if="${sol.status == 'PENDIENTE'}" style="display: flex; gap: 5px;">
+                                <form th:action="@{/rrhh/permisos/estado}" method="post">
+                                    <input type="hidden" name="permisoId" th:value="${sol.id}">
+                                    <input type="hidden" name="status" value="APROBADO">
+                                    <button type="submit" class="btn" style="padding: 5px 10px; background: #16a34a; font-size: 0.75rem;" title="Aprobar"><i class="fas fa-check"></i></button>
+                                </form>
+                                <form th:action="@{/rrhh/permisos/estado}" method="post">
+                                    <input type="hidden" name="permisoId" th:value="${sol.id}">
+                                    <input type="hidden" name="status" value="RECHAZADO">
+                                    <button type="submit" class="btn" style="padding: 5px 10px; background: #dc2626; font-size: 0.75rem;" title="Rechazar"><i class="fas fa-times"></i></button>
+                                </form>
+                            </div>
+                            <small th:if="${sol.status != 'PENDIENTE'}" th:text="${'Gestionado'}" style="color: #94a3b8; font-style: italic;"></small>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(solicitudes)}">
+                        <td colspan="4" style="padding: 20px; text-align: center; color: #94a3b8;">No hay solicitudes de ausencia registradas.</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+</div>
+</body>
+</html>

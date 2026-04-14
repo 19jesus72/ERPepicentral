@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Epicentral | Desempeño 360°</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+<div class="main-wrapper">
+    <nav class="sidebar" th:replace="~{dashboard :: sidebar}"></nav>
+
+    <main class="content">
+        <header class="top-bar">
+            <h1>Analítica de Rendimiento Técnico</h1>
+            <div class="user-info"><span>Master Control | Quito</span></div>
+        </header>
+
+        <div class="dashboard-grid">
+
+            <div class="widget" style="grid-column: span 3; min-height: 400px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h3 style="color: var(--primary); margin: 0;"><i class="fas fa-chart-line"></i> Tendencias de Productividad</h3>
+                    <div style="display: flex; gap: 10px;">
+                        <button onclick="cambiarPeriodo('semanal')" class="btn" style="padding: 5px 12px; font-size: 0.7rem; background: #64748b;">SEMANAL</button>
+                        <button onclick="cambiarPeriodo('mensual')" class="btn" style="padding: 5px 12px; font-size: 0.7rem; background: var(--secondary);">MENSUAL</button>
+                    </div>
+                </div>
+                <canvas id="performanceChart" style="max-height: 300px;"></canvas>
+            </div>
+
+            <div class="widget" style="grid-column: span 1;">
+                <h3 style="color: var(--primary); margin-top: 0; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;">
+                    <i class="fas fa-user-check"></i> Evaluación 360°
+                </h3>
+                <form th:action="@{/rrhh/kpi/guardar}" method="post">
+                    <select name="userId" class="input-field" required>
+                        <option value="" disabled selected>Seleccionar Técnico...</option>
+                        <option th:each="emp : ${empleados}" th:value="${emp.id}" th:text="${emp.firstName + ' ' + emp.firstSurname}"></option>
+                    </select>
+
+                    <div style="background: #f8fafc; padding: 12px; border-radius: 8px; font-size: 0.8rem;">
+                        <label>Habilidad Técnica (1-5)</label>
+                        <input type="range" name="technicalScore" min="1" max="5" class="input-field" style="height: 10px;">
+
+                        <label>Eficiencia / Tiempos (1-5)</label>
+                        <input type="range" name="efficiencyScore" min="1" max="5" class="input-field" style="height: 10px;">
+
+                        <label>Satisfacción Cliente (1-5)</label>
+                        <input type="range" name="clientSatisfaction" min="1" max="5" class="input-field" style="height: 10px;">
+
+                        <label>Clima Colaborativo (1-5)</label>
+                        <input type="range" name="colleagueScore" min="1" max="5" class="input-field" style="height: 10px;">
+
+                        <input type="hidden" name="safetyScore" value="5">
+                        <input type="hidden" name="punctualityScore" value="5">
+                    </div>
+
+                    <textarea name="feedback" class="input-field" rows="2" placeholder="Notas de campo..." required style="margin-top: 10px;"></textarea>
+                    <button type="submit" class="btn" style="width: 100%; background: var(--primary);">GUARDAR MÉTRICAS</button>
+                </form>
+            </div>
+
+            <div class="widget" style="grid-column: span 2;">
+                <h3 style="color: var(--primary); margin-top: 0; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;">Últimas Evaluaciones</h3>
+                <div th:each="ev : ${evaluaciones}" style="padding: 10px; border-bottom: 1px solid #eee;">
+                    <div style="display: flex; justify-content: space-between;">
+                        <strong th:text="${ev.employee.firstName + ' ' + ev.employee.firstSurname}"></strong>
+                        <span style="font-weight: bold; color: var(--secondary);" th:text="${#numbers.formatDecimal(ev.averageScore, 1, 1) + ' ★'}"></span>
+                    </div>
+                    <small style="color: #94a3b8;" th:text="${'Eficiencia: ' + ev.efficiencyScore + ' | Cliente: ' + ev.clientSatisfaction}"></small>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script th:inline="javascript">
+    const ctx = document.getElementById('performanceChart').getContext('2d');
+    const dataHistorial = /*[[${evaluaciones}]]*/ [];
+
+    // Simplificación: Extraer promedios para la gráfica
+    const labels = dataHistorial.map(e => e.evaluationDate).reverse();
+    const scores = dataHistorial.map(e => (e.technicalScore + e.efficiencyScore + e.clientSatisfaction + e.colleagueScore)/4).reverse();
+
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Promedio de Desempeño Master Control',
+                data: scores,
+                borderColor: '#3b82f6',
+                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                fill: true,
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: { y: { min: 1, max: 5 } }
+        }
+    });
+</script>
+</body>
+</html>

@@ -24,6 +24,12 @@ public class RRHHController {
     @Autowired
     private TimeRecordRepository timeRecordRepository;
 
+    @Autowired
+    private AbsenceRequestRepository absenceRequestRepository;
+
+    @Autowired
+    private PerformanceEvaluationRepository kpiRepository;
+
     // Panel General
     @GetMapping("/panel")
     public String mostrarPanelRRHH() {
@@ -163,5 +169,94 @@ public class RRHHController {
         return "rrhh-timesheet";
     }
 
+    // ---------------------------------------------------------
+    // MÓDULO DE PERMISOS Y AUSENCIAS
+    // ---------------------------------------------------------
+
+    @GetMapping("/permisos")
+    public String gestionarPermisos(Model model) {
+        // Traemos todas las solicitudes
+        model.addAttribute("solicitudes", absenceRequestRepository.findAllByOrderByStartDateDesc());
+
+        // Traemos a todo el personal para llenar el menú desplegable del formulario
+        model.addAttribute("empleados", userRepository.findAll());
+
+        return "rrhh-permisos";
+    }
+
+    @PostMapping("/permisos/guardar")
+    public String registrarPermiso(@RequestParam("userId") Long userId,
+                                   @RequestParam("absenceType") String absenceType,
+                                   @RequestParam("startDate") LocalDate startDate,
+                                   @RequestParam("endDate") LocalDate endDate,
+                                   @RequestParam("reason") String reason) {
+
+        User empleado = userRepository.findById(userId).orElseThrow();
+
+        AbsenceRequest permiso = new AbsenceRequest();
+        permiso.setUser(empleado);
+        permiso.setAbsenceType(absenceType);
+        permiso.setStartDate(startDate);
+        permiso.setEndDate(endDate);
+        permiso.setReason(reason);
+        // Por defecto entra como PENDIENTE
+
+        absenceRequestRepository.save(permiso);
+        return "redirect:/rrhh/permisos?registrado";
+    }
+
+    @PostMapping("/permisos/estado")
+    public String cambiarEstadoPermiso(@RequestParam("permisoId") Long permisoId,
+                                       @RequestParam("status") String status,
+                                       @RequestParam(value = "adminNotes", required = false) String adminNotes) {
+
+        AbsenceRequest permiso = absenceRequestRepository.findById(permisoId).orElseThrow();
+        permiso.setStatus(status);
+        if (adminNotes != null && !adminNotes.isEmpty()) {
+            permiso.setAdminNotes(adminNotes);
+        }
+
+        absenceRequestRepository.save(permiso);
+        return "redirect:/rrhh/permisos?actualizado";
+    }
+
+    @GetMapping("/kpi")
+    public String panelKPI(Model model) {
+        // Traemos el historial de evaluaciones
+        model.addAttribute("evaluaciones", kpiRepository.findAllByOrderByEvaluationDateDesc());
+        // Traemos a los empleados para el selector del formulario
+        model.addAttribute("empleados", userRepository.findAll());
+        return "rrhh-kpi";
+    }
+
+    @PostMapping("/kpi/guardar")
+    public String guardarKPI(@RequestParam("userId") Long userId,
+                             @RequestParam("technicalScore") Integer technicalScore,
+                             @RequestParam("punctualityScore") Integer punctualityScore,
+                             @RequestParam("safetyScore") Integer safetyScore,
+                             @RequestParam("efficiencyScore") Integer efficiencyScore,
+                             @RequestParam("clientSatisfaction") Integer clientSatisfaction,
+                             @RequestParam("colleagueScore") Integer colleagueScore,
+                             @RequestParam("feedback") String feedback,
+                             Principal principal) {
+
+        User empleado = userRepository.findById(userId).orElseThrow();
+
+        PerformanceEvaluation evaluacion = new PerformanceEvaluation();
+        evaluacion.setEmployee(empleado);
+        evaluacion.setEvaluationDate(LocalDate.now());
+        evaluacion.setEvaluatorName(principal.getName());
+
+        evaluacion.setTechnicalScore(technicalScore);
+        evaluacion.setPunctualityScore(punctualityScore);
+        evaluacion.setSafetyScore(safetyScore);
+        evaluacion.setEfficiencyScore(efficiencyScore);
+        evaluacion.setClientSatisfaction(clientSatisfaction);
+        evaluacion.setColleagueScore(colleagueScore);
+        evaluacion.setFeedback(feedback);
+
+        kpiRepository.save(evaluacion);
+        return "redirect:/rrhh/kpi?exito";
+    }
 
 }
