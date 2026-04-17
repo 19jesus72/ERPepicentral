@@ -5,6 +5,52 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/estilos.css}">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        .rating-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* Dos columnas para ahorrar espacio */
+            gap: 15px;
+        }
+        .rating-group {
+            display: flex;
+            gap: 4px;
+        }
+        /* Ocultamos el circulo del radio button original */
+        .rating-group input[type="radio"] {
+            display: none;
+        }
+        /* Diseñamos el texto como si fuera un botón cuadrado */
+        .rating-group label {
+            flex: 1;
+            text-align: center;
+            padding: 8px 0;
+            background: #f1f5f9;
+            border: 1px solid #cbd5e1;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            color: #64748b;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+        }
+        /* Cuando el usuario hace clic, la caja se pinta de color azul/primario */
+        .rating-group input[type="radio"]:checked + label {
+            background: var(--secondary);
+            color: white;
+            border-color: var(--secondary);
+            transform: scale(1.05); /* Pequeño efecto de zoom */
+        }
+        .rating-title {
+            font-size: 0.75rem;
+            font-weight: bold;
+            color: #1e3a8a;
+            display: block;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
 </head>
 <body>
 <div class="main-wrapper">
@@ -39,21 +85,74 @@
                         <option th:each="emp : ${empleados}" th:value="${emp.id}" th:text="${emp.firstName + ' ' + emp.firstSurname}"></option>
                     </select>
 
-                    <div style="background: #f8fafc; padding: 12px; border-radius: 8px; font-size: 0.8rem;">
-                        <label>Habilidad Técnica (1-5)</label>
-                        <input type="range" name="technicalScore" min="1" max="5" class="input-field" style="height: 10px;">
+                    <div class="rating-grid" style="background: #f8fafc; padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #e2e8f0;">
 
-                        <label>Eficiencia / Tiempos (1-5)</label>
-                        <input type="range" name="efficiencyScore" min="1" max="5" class="input-field" style="height: 10px;">
+                        <div>
+                            <span class="rating-title">Habilidad Técnica</span>
+                            <div class="rating-group">
+                                <input type="radio" id="t1" name="technicalScore" value="1" required><label for="t1">1</label>
+                                <input type="radio" id="t2" name="technicalScore" value="2"><label for="t2">2</label>
+                                <input type="radio" id="t3" name="technicalScore" value="3"><label for="t3">3</label>
+                                <input type="radio" id="t4" name="technicalScore" value="4"><label for="t4">4</label>
+                                <input type="radio" id="t5" name="technicalScore" value="5"><label for="t5">5</label>
+                            </div>
+                        </div>
 
-                        <label>Satisfacción Cliente (1-5)</label>
-                        <input type="range" name="clientSatisfaction" min="1" max="5" class="input-field" style="height: 10px;">
+                        <div>
+                            <span class="rating-title">Eficiencia / Tiempos</span>
+                            <div class="rating-group">
+                                <input type="radio" id="e1" name="efficiencyScore" value="1" required><label for="e1">1</label>
+                                <input type="radio" id="e2" name="efficiencyScore" value="2"><label for="e2">2</label>
+                                <input type="radio" id="e3" name="efficiencyScore" value="3"><label for="e3">3</label>
+                                <input type="radio" id="e4" name="efficiencyScore" value="4"><label for="e4">4</label>
+                                <input type="radio" id="e5" name="efficiencyScore" value="5"><label for="e5">5</label>
+                            </div>
+                        </div>
 
-                        <label>Clima Colaborativo (1-5)</label>
-                        <input type="range" name="colleagueScore" min="1" max="5" class="input-field" style="height: 10px;">
+                        <div>
+                            <span class="rating-title">Seguridad Industrial EPP</span>
+                            <div class="rating-group">
+                                <input type="radio" id="s1" name="safetyScore" value="1" required><label for="s1">1</label>
+                                <input type="radio" id="s2" name="safetyScore" value="2"><label for="s2">2</label>
+                                <input type="radio" id="s3" name="safetyScore" value="3"><label for="s3">3</label>
+                                <input type="radio" id="s4" name="safetyScore" value="4"><label for="s4">4</label>
+                                <input type="radio" id="s5" name="safetyScore" value="5"><label for="s5">5</label>
+                            </div>
+                        </div>
 
-                        <input type="hidden" name="safetyScore" value="5">
-                        <input type="hidden" name="punctualityScore" value="5">
+                        <div>
+                            <span class="rating-title">Puntualidad</span>
+                            <div class="rating-group">
+                                <input type="radio" id="p1" name="punctualityScore" value="1" required><label for="p1">1</label>
+                                <input type="radio" id="p2" name="punctualityScore" value="2"><label for="p2">2</label>
+                                <input type="radio" id="p3" name="punctualityScore" value="3"><label for="p3">3</label>
+                                <input type="radio" id="p4" name="punctualityScore" value="4"><label for="p4">4</label>
+                                <input type="radio" id="p5" name="punctualityScore" value="5"><label for="p5">5</label>
+                            </div>
+                        </div>
+
+                        <div>
+                            <span class="rating-title">Satisfacción del Cliente</span>
+                            <div class="rating-group">
+                                <input type="radio" id="c1" name="clientSatisfaction" value="1" required><label for="c1">1</label>
+                                <input type="radio" id="c2" name="clientSatisfaction" value="2"><label for="c2">2</label>
+                                <input type="radio" id="c3" name="clientSatisfaction" value="3"><label for="c3">3</label>
+                                <input type="radio" id="c4" name="clientSatisfaction" value="4"><label for="c4">4</label>
+                                <input type="radio" id="c5" name="clientSatisfaction" value="5"><label for="c5">5</label>
+                            </div>
+                        </div>
+
+                        <div>
+                            <span class="rating-title">Clima Colaborativo</span>
+                            <div class="rating-group">
+                                <input type="radio" id="co1" name="colleagueScore" value="1" required><label for="co1">1</label>
+                                <input type="radio" id="co2" name="colleagueScore" value="2"><label for="co2">2</label>
+                                <input type="radio" id="co3" name="colleagueScore" value="3"><label for="co3">3</label>
+                                <input type="radio" id="co4" name="colleagueScore" value="4"><label for="co4">4</label>
+                                <input type="radio" id="co5" name="colleagueScore" value="5"><label for="co5">5</label>
+                            </div>
+                        </div>
+
                     </div>
 
                     <textarea name="feedback" class="input-field" rows="2" placeholder="Notas de campo..." required style="margin-top: 10px;"></textarea>

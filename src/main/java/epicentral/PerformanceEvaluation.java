@@ -68,8 +68,16 @@ public class PerformanceEvaluation {
     public void setColleagueScore(Integer colleagueScore) { this.colleagueScore = colleagueScore; }
 
     // Metodo auxiliar para calcular el promedio en la vista
+    // Método auxiliar seguro para calcular el promedio en la vista
     public Double getAverageScore() {
-        return (technicalScore + punctualityScore + safetyScore +
-                efficiencyScore + clientSatisfaction + colleagueScore) / 6.0;
+        // Convertimos los valores nulos a 0 de forma segura antes de sumar
+        double t = (technicalScore != null) ? technicalScore : 0.0;
+        double p = (punctualityScore != null) ? punctualityScore : 0.0;
+        double s = (safetyScore != null) ? safetyScore : 0.0;
+        double e = (efficiencyScore != null) ? efficiencyScore : 0.0;
+        double c = (clientSatisfaction != null) ? clientSatisfaction : 0.0;
+        double col = (colleagueScore != null) ? colleagueScore : 0.0;
+
+        return (t + p + s + e + c + col) / 6.0;
     }
 }
