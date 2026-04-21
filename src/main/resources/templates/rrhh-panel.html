@@ -1,66 +1,73 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Epicentral | Recursos Humanos</title>
+    <meta charset="UTF-8">
+    <title>Epicentral | Panel RRHH</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/estilos.css}">
 </head>
 <body>
 <div class="main-wrapper">
-    <nav class="sidebar">
-        <div class="logo">
-            <h2>EPICENTRAL</h2>
-            <small style="color: #94a3b8; margin-left: 5px; font-weight: bold;">MÓDULO RRHH</small>
-        </div>
 
-        <ul style="margin-top: 20px;">
-            <li style="margin-bottom: 15px;">
-                <a href="/" style="background: #1e293b;"><i class="fas fa-arrow-left"></i> Volver al Inicio</a>
-            </li>
-
-            <li>
-                <a href="/rrhh/panel" style="background: var(--primary); color: white;"><i class="fas fa-home"></i> Panel General</a>
-            </li>
-
-            <li><a href="/usuarios/actualizar"><i class="fas fa-users"></i> Personal</a></li>
-
-            <li><a href="/rrhh/reloj"><i class="fas fa-clock"></i> Registro de Horas</a></li>
-            <li><a href="/rrhh/kpi"><i class="fas fa-chart-line"></i> KPI y Rendimiento</a></li>
-            <li><a href="#"><i class="fas fa-calendar-check"></i> Registro de Permisos</a></li>
-            <li><a href="/rrhh/timesheet"><i class="fas fa-list-alt"></i> Hoja de Tiempos</a></li>
-            <li><a href="#"><i class="fas fa-calendar-alt"></i> Actividades Programadas</a></li>
-        </ul>
-    </nav>
+    <nav class="sidebar" th:replace="~{dashboard :: sidebar}"></nav>
 
     <main class="content">
         <header class="top-bar">
-            <h1>Centro de Talento Humano</h1>
+            <h1>Gestión de Talento Humano</h1>
             <div class="user-info">
-                <span>Admin: <strong>Jesus Álvarez</strong></span>
+                <span>Área Administrativa | <strong>Master Control</strong></span>
             </div>
         </header>
 
         <div class="dashboard-grid">
-            <div class="widget" style="grid-column: span 3; background: linear-gradient(135deg, var(--primary) 0%, #0f172a 100%); color: white; border: none;">
+
+            <div class="widget" style="grid-column: span 3; background: linear-gradient(135deg, #1e293b 0%, #334155 100%); color: white; border: none;">
                 <i class="fas fa-users-cog icon-bg" style="color: rgba(255,255,255,0.05);"></i>
-                <h2 style="margin-top: 0;">Gestión Integral de Colaboradores</h2>
-                <p style="color: #cbd5e1; max-width: 600px; line-height: 1.6;">
-                    Desde este panel administrarás todo el ciclo de vida de los trabajadores,
-                    desde su registro de información médica e identificación, hasta la evaluación de su rendimiento en campo.
+                <h2 style="margin-top: 0;">Bienvenido al Portal de Recursos Humanos</h2>
+                <p style="color: #cbd5e1; max-width: 700px; line-height: 1.6;">
+                    Desde aquí podrá administrar el ciclo de vida completo de los técnicos y colaboradores:
+                    desde la contratación y el registro de asistencia en campo, hasta la evaluación de desempeño 360° y el desglose de nómina.
                 </p>
             </div>
 
             <div class="widget">
-                <h3 style="color: var(--primary); margin-top: 0;"><i class="fas fa-id-card"></i> Directorio</h3>
-                <p style="color: #64748b; font-size: 0.9rem; margin-bottom: 15px;">Accede al listado maestro de técnicos y administrativos.</p>
-                <a href="/usuarios/actualizar" class="btn" style="display: inline-block; padding: 8px 15px; font-size: 0.8rem; background: var(--secondary); text-decoration: none;">Gestionar Personal</a>
+                <h3 style="color: var(--primary); margin-top: 0;"><i class="fas fa-address-book"></i> Directorio</h3>
+                <p style="color: #64748b; font-size: 0.85rem; margin-bottom: 20px;">Gestione las fichas técnicas, trayectoria y habilidades de todo el personal.</p>
+                <a href="/rrhh/personal" class="btn" style="display: block; text-align: center; text-decoration: none; background: var(--secondary);">Ver Colaboradores</a>
             </div>
 
             <div class="widget">
-                <h3 style="color: var(--primary); margin-top: 0;"><i class="fas fa-calendar-day"></i> Agenda</h3>
-                <p style="color: #64748b; font-size: 0.9rem; margin-bottom: 15px;">No hay capacitaciones ni actividades pendientes hoy.</p>
-                <a href="#" class="btn" style="display: inline-block; padding: 8px 15px; font-size: 0.8rem; background: #0f172a; text-decoration: none;">Ver Calendario</a>
+                <h3 style="color: var(--primary); margin-top: 0;"><i class="fas fa-user-clock"></i> Control Horario</h3>
+                <p style="color: #64748b; font-size: 0.85rem; margin-bottom: 20px;">Monitoree el reloj virtual y las hojas de tiempo de los proyectos activos.</p>
+                <div style="display: flex; gap: 10px;">
+                    <a href="/rrhh/reloj" class="btn" style="flex: 1; font-size: 0.75rem; text-decoration: none; background: #0f172a;">Reloj</a>
+                    <a href="/rrhh/timesheet" class="btn" style="flex: 1; font-size: 0.75rem; text-decoration: none; background: var(--secondary);">Timesheet</a>
+                </div>
             </div>
+
+            <div class="widget">
+                <h3 style="color: var(--primary); margin-top: 0;"><i class="fas fa-hand-holding-usd"></i> Nómina</h3>
+                <p style="color: #64748b; font-size: 0.85rem; margin-bottom: 20px;">Genere roles de pago con cálculos automáticos de IESS y bonificaciones.</p>
+                <a href="/rrhh/nomina" class="btn" style="display: block; text-align: center; text-decoration: none; background: #16a34a;">Gestionar Pagos</a>
+            </div>
+
+            <div class="widget" style="grid-column: span 1;">
+                <h3 style="color: var(--primary); margin-top: 0;"><i class="fas fa-chart-line"></i> Desempeño KPI</h3>
+                <p style="color: #64748b; font-size: 0.85rem; margin-bottom: 20px;">Analice las métricas de eficiencia técnica y satisfacción del cliente.</p>
+                <a href="/rrhh/kpi" class="btn" style="display: block; text-align: center; text-decoration: none; background: var(--primary);">Ver Analítica</a>
+            </div>
+
+            <div class="widget" style="grid-column: span 2;">
+                <h3 style="color: var(--primary); margin-top: 0;"><i class="fas fa-calendar-alt"></i> Actividades y Permisos</h3>
+                <div style="display: flex; gap: 20px; align-items: center;">
+                    <p style="color: #64748b; font-size: 0.85rem; flex: 1;">Administre las ausencias, vacaciones y el calendario general de capacitaciones de Master Control.</p>
+                    <div style="display: flex; flex-direction: column; gap: 10px;">
+                        <a href="/rrhh/permisos" style="color: var(--secondary); font-weight: bold; text-decoration: none; font-size: 0.9rem;"><i class="fas fa-check-circle"></i> Aprobar Permisos</a>
+                        <a href="/rrhh/calendario" style="color: var(--secondary); font-weight: bold; text-decoration: none; font-size: 0.9rem;"><i class="fas fa-calendar-day"></i> Ver Calendario</a>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </main>
 </div>

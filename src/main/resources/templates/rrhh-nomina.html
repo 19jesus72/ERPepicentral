@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Epicentral | Desglose de Nómina</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+</head>
+<body>
+<div class="main-wrapper">
+    <nav class="sidebar" th:replace="~{dashboard :: sidebar}"></nav>
+
+    <main class="content">
+        <header class="top-bar">
+            <h1>Control Financiero y Roles de Pago</h1>
+            <div class="user-info"><span>Módulo: <strong>Recursos Humanos</strong></span></div>
+        </header>
+
+        <div class="dashboard-grid">
+
+            <div class="widget" style="grid-column: span 1; height: fit-content; border-top: 5px solid #16a34a;">
+                <h3 style="color: var(--primary); margin-top: 0; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;">
+                    <i class="fas fa-file-invoice-dollar"></i> Generar Rol
+                </h3>
+
+                <form th:action="@{/rrhh/nomina/generar}" method="post">
+                    <div style="margin-bottom: 15px;">
+                        <label style="font-size: 0.8rem; font-weight: bold; color: #475569;">Colaborador</label>
+                        <select name="userId" class="input-field" required>
+                            <option value="" disabled selected>Seleccionar Técnico...</option>
+                            <option th:each="emp : ${empleados}" th:value="${emp.id}" th:text="${emp.firstName + ' ' + emp.firstSurname}"></option>
+                        </select>
+                    </div>
+
+                    <div style="margin-bottom: 15px;">
+                        <label style="font-size: 0.8rem; font-weight: bold; color: #475569;">Período (Ej: Abril 2026)</label>
+                        <input type="text" name="period" class="input-field" required>
+                    </div>
+
+                    <div style="background: #f0fdf4; padding: 12px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #bbf7d0;">
+                        <label style="font-size: 0.8rem; font-weight: bold; color: #166534; display: block; margin-bottom: 5px;">Salario Base (USD)</label>
+                        <input type="number" step="0.01" name="baseSalary" class="input-field" required>
+
+                        <label style="font-size: 0.8rem; font-weight: bold; color: #166534; display: block; margin-bottom: 5px; margin-top: 10px;">Horas Extras (USD)</label>
+                        <input type="number" step="0.01" name="overtimeBonus" value="0" class="input-field">
+
+                        <label style="font-size: 0.8rem; font-weight: bold; color: #166534; display: block; margin-bottom: 5px; margin-top: 10px;">Bono por KPI / Productividad (USD)</label>
+                        <input type="number" step="0.01" name="performanceBonus" value="0" class="input-field" style="margin-bottom: 0;">
+                    </div>
+
+                    <div style="background: #fef2f2; padding: 12px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #fecaca;">
+                        <label style="font-size: 0.8rem; font-weight: bold; color: #991b1b; display: block; margin-bottom: 5px;">Descuento por Faltas / Préstamos (USD)</label>
+                        <input type="number" step="0.01" name="absenceDeduction" value="0" class="input-field" style="margin-bottom: 0;">
+                        <small style="color: #dc2626; margin-top: 5px; display: block;"><i class="fas fa-info-circle"></i> El descuento del IESS (9.45%) se calcula automáticamente.</small>
+                    </div>
+
+                    <button type="submit" class="btn" style="width: 100%; background: #16a34a;">PROCESAR CÁLCULO</button>
+                </form>
+            </div>
+
+            <div class="widget" style="grid-column: span 2;">
+                <h3 style="color: var(--primary); margin-top: 0; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;">
+                    <i class="fas fa-list"></i> Registro de Pagos
+                </h3>
+
+                <table style="width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 0.9rem;">
+                    <thead>
+                    <tr style="text-align: left; border-bottom: 2px solid #e2e8f0; color: #64748b; background: #f8fafc;">
+                        <th style="padding: 10px;">COLABORADOR</th>
+                        <th style="padding: 10px;">PERÍODO</th>
+                        <th style="padding: 10px;">INGRESOS</th>
+                        <th style="padding: 10px;">IESS</th>
+                        <th style="padding: 10px;">NETO A PAGAR</th>
+                        <th style="padding: 10px;">ESTADO</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="nom : ${nominas}" style="border-bottom: 1px solid #f1f5f9;">
+                        <td style="padding: 10px;">
+                            <strong th:text="${nom.employee.firstName + ' ' + nom.employee.firstSurname}" style="color: #1e3a8a; display: block;"></strong>
+                            <small th:text="${nom.employee.documentNumber}" style="color: #64748b;"></small>
+                        </td>
+                        <td style="padding: 10px; font-weight: bold; color: #475569;" th:text="${nom.period}"></td>
+                        <td style="padding: 10px; color: #16a34a;">
+                            $<span th:text="${#numbers.formatDecimal(nom.baseSalary + nom.overtimeBonus + nom.performanceBonus, 1, 2)}"></span>
+                        </td>
+                        <td style="padding: 10px; color: #dc2626;">
+                            -$<span th:text="${#numbers.formatDecimal(nom.iessDeduction, 1, 2)}"></span>
+                        </td>
+                        <td style="padding: 10px; font-weight: 900; font-size: 1.1rem;">
+                            $<span th:text="${#numbers.formatDecimal(nom.netSalary, 1, 2)}"></span>
+                        </td>
+                        <td style="padding: 10px;">
+                            <div th:if="${nom.status == 'PENDIENTE'}">
+                                <form th:action="@{/rrhh/nomina/pagar}" method="post">
+                                    <input type="hidden" name="nominaId" th:value="${nom.id}">
+                                    <button type="submit" class="btn" style="padding: 4px 10px; background: #eab308; color: black; font-size: 0.75rem; width: 100%;">
+                                        MARCAR PAGO
+                                    </button>
+                                </form>
+                            </div>
+                            <span th:if="${nom.status == 'PAGADO'}" style="background: #1e293b; color: white; padding: 4px 10px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; display: block; text-align: center;">
+                                        <i class="fas fa-check"></i> TRANSFERIDO
+                                    </span>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(nominas)}">
+                        <td colspan="6" style="padding: 20px; text-align: center; color: #94a3b8;">No se han generado roles de pago.</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+</div>
+</body>
+</html>

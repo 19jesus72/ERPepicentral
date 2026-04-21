@@ -30,6 +30,12 @@ public class RRHHController {
     @Autowired
     private PerformanceEvaluationRepository kpiRepository;
 
+    @Autowired
+    private PayrollRepository payrollRepository;
+
+    @Autowired
+    private CompanyActivityRepository activityRepository;
+
     // Panel General
     @GetMapping("/panel")
     public String mostrarPanelRRHH() {
@@ -257,6 +263,78 @@ public class RRHHController {
 
         kpiRepository.save(evaluacion);
         return "redirect:/rrhh/kpi?exito";
+    }
+
+    @GetMapping("/nomina")
+    public String panelNomina(Model model) {
+        model.addAttribute("nominas", payrollRepository.findAllByOrderByIssueDateDesc());
+        model.addAttribute("empleados", userRepository.findAll());
+        return "rrhh-nomina";
+    }
+
+    @PostMapping("/nomina/generar")
+    public String generarRolDePago(@RequestParam("userId") Long userId,
+                                   @RequestParam("period") String period,
+                                   @RequestParam("baseSalary") Double baseSalary,
+                                   @RequestParam(value = "overtimeBonus", defaultValue = "0") Double overtimeBonus,
+                                   @RequestParam(value = "performanceBonus", defaultValue = "0") Double performanceBonus,
+                                   @RequestParam(value = "absenceDeduction", defaultValue = "0") Double absenceDeduction) {
+
+        User empleado = userRepository.findById(userId).orElseThrow();
+
+        Payroll rol = new Payroll();
+        rol.setEmployee(empleado);
+        rol.setPeriod(period);
+        rol.setIssueDate(LocalDate.now());
+        rol.setBaseSalary(baseSalary);
+        rol.setOvertimeBonus(overtimeBonus);
+        rol.setPerformanceBonus(performanceBonus);
+        rol.setAbsenceDeduction(absenceDeduction);
+
+        // Ejecutamos el motor de cálculo
+        rol.calculateNetSalary();
+
+        payrollRepository.save(rol);
+
+        return "redirect:/rrhh/nomina?generado";
+    }
+
+    @PostMapping("/nomina/pagar")
+    public String marcarComoPagado(@RequestParam("nominaId") Long nominaId) {
+        Payroll rol = payrollRepository.findById(nominaId).orElseThrow();
+        rol.setStatus("PAGADO");
+        payrollRepository.save(rol);
+        return "redirect:/rrhh/nomina?pagado";
+    }
+
+    @GetMapping("/calendario")
+    public String verCalendario(Model model) {
+        // 1. Traer solo los permisos que RRHH ya aprobó
+        model.addAttribute("permisosAprobados", absenceRequestRepository.findByStatusOrderByStartDateDesc("APROBADO"));
+
+        // 2. Traer las actividades y capacitaciones
+        model.addAttribute("actividades", activityRepository.findAll());
+
+        return "rrhh-calendario";
+    }
+
+    @PostMapping("/calendario/guardar")
+    public String agendarActividad(@RequestParam("title") String title,
+                                   @RequestParam("activityType") String activityType,
+                                   @RequestParam("startDate") LocalDate startDate,
+                                   @RequestParam(value = "endDate", required = false) LocalDate endDate,
+                                   @RequestParam("description") String description) {
+
+        CompanyActivity actividad = new CompanyActivity();
+        actividad.setTitle(title);
+        actividad.setActivityType(activityType);
+        actividad.setStartDate(startDate);
+        // Si es un evento de un solo día, igualamos las fechas
+        actividad.setEndDate(endDate != null ? endDate : startDate);
+        actividad.setDescription(description);
+
+        activityRepository.save(actividad);
+        return "redirect:/rrhh/calendario?agendado";
     }
 
 }

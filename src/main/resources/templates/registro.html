@@ -7,21 +7,7 @@
 </head>
 <body>
 <div class="main-wrapper">
-    <nav class="sidebar">
-        <div class="logo">
-            <h2>EPICENTRAL</h2>
-        </div>
-        <li>
-            <a href="#"><i class="fas fa-users"></i> Usuarios</a>
-            <ul class="submenu">
-                <li><a href="/usuarios/crear"><i class="fas fa-user-plus"></i> Creación</a></li>
-                <li><a href="/usuarios/actualizar"><i class="fas fa-user-edit"></i> Actualización</a></li>
-                <li><a href="/usuarios/permisos"><i class="fas fa-key"></i> Acceso Pantallas</a></li>
-                <li><a href="/usuarios/logs"><i class="fas fa-history"></i> Eventos y Logs</a></li>
-            </ul>
-        </li>
-    </nav>
-
+    <nav class="sidebar" th:replace="~{dashboard :: sidebar}"></nav>
     <main class="content">
         <header class="top-bar">
             <h1>Gestión de Usuarios</h1>

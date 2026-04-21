@@ -7,20 +7,7 @@
 </head>
 <body>
 <div class="main-wrapper">
-    <nav class="sidebar">
-        <div class="logo">
-            <h2>EPICENTRAL</h2>
-            <small style="color: #94a3b8; margin-left: 5px; font-weight: bold;">MÓDULO RRHH</small>
-        </div>
-        <ul style="margin-top: 20px;">
-            <li style="margin-bottom: 15px;"><a href="/" style="background: #1e293b;"><i class="fas fa-arrow-left"></i> Volver al Inicio</a></li>
-            <li><a href="/rrhh/panel"><i class="fas fa-home"></i> Panel General</a></li>
-            <li><a href="/rrhh/personal" style="background: var(--primary); color: white;"><i class="fas fa-users"></i> Personal</a></li>
-            <li><a href="#"><i class="fas fa-clock"></i> Registro de Horas</a></li>
-            <li><a href="#"><i class="fas fa-chart-line"></i> KPI y Rendimiento</a></li>
-        </ul>
-    </nav>
-
+    <nav class="sidebar" th:replace="~{dashboard :: sidebar}"></nav>
     <main class="content">
         <header class="top-bar">
             <h1>Directorio de Colaboradores</h1>

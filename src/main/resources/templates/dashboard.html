@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
+  <meta charset="UTF-8">
   <title>Epicentral | Master Control ERP</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <link rel="stylesheet" th:href="@{/css/estilos.css}">
@@ -9,20 +10,24 @@
 <div class="main-wrapper">
 
   <nav class="sidebar" th:fragment="sidebar">
-    <div class="logo" style="margin-bottom: 10px;">
+    <div class="logo">
       <h2>EPICENTRAL</h2>
-      <small style="color: #94a3b8; margin-left: 5px; font-weight: bold; letter-spacing: 1px;">SISTEMA ERP</small>
+      <small style="color: #94a3b8; font-weight: bold; letter-spacing: 1px;">MASTER CONTROL</small>
     </div>
 
-    <ul style="margin-top: 20px;">
-      <li><a href="/" style="background: var(--primary); color: white;"><i class="fas fa-home"></i> Inicio Global</a></li>
+    <ul style="margin-top: 25px;">
+      <li>
+        <a href="/" style="background: var(--primary); color: white;">
+          <i class="fas fa-home"></i> Inicio Global
+        </a>
+      </li>
 
       <li><a href="#"><i class="fas fa-video"></i> Cámaras y Seguridad</a></li>
       <li><a href="#"><i class="fas fa-tools"></i> Mantenimiento GLP</a></li>
       <li><a href="#"><i class="fas fa-boxes"></i> Inventario TICs</a></li>
 
       <li>
-        <a href="#"><i class="fas fa-user-shield"></i> Accesos y Seguridad</a>
+        <a href="#"><i class="fas fa-user-shield"></i> Seguridad y Logs</a>
         <ul class="submenu">
           <li><a href="/usuarios/crear"><i class="fas fa-user-plus"></i> Crear Credencial</a></li>
           <li><a href="/usuarios/actualizar"><i class="fas fa-users-cog"></i> Gestión de Usuarios</a></li>
@@ -31,15 +36,21 @@
       </li>
 
       <li>
-        <a href="/rrhh/panel"><i class="fas fa-id-badge"></i> Recursos Humanos</a>
+        <p style="color: #64748b; font-size: 0.7rem; font-weight: bold; padding: 10px 20px; margin: 0; text-transform: uppercase;">Talento Humano</p>
       </li>
-
-      <li>
-        <a href="/rrhh/permisos"><i class="fas fa-calendar-check"></i> Registro de Permisos</a>
-      </li>
+      <li><a href="/rrhh/panel"><i class="fas fa-id-badge"></i> Panel RRHH</a></li>
+      <li><a href="/rrhh/personal"><i class="fas fa-users"></i> Directorio Personal</a></li>
+      <li><a href="/rrhh/reloj"><i class="fas fa-clock"></i> Registro de Horas</a></li>
+      <li><a href="/rrhh/timesheet"><i class="fas fa-list-alt"></i> Hoja de Tiempos</a></li>
+      <li><a href="/rrhh/kpi"><i class="fas fa-chart-line"></i> KPI y Rendimiento</a></li>
+      <li><a href="/rrhh/permisos"><i class="fas fa-calendar-check"></i> Gestión de Permisos</a></li>
+      <li><a href="/rrhh/nomina"><i class="fas fa-file-invoice-dollar"></i> Desglose de Nómina</a></li>
+      <li><a href="/rrhh/calendario"><i class="fas fa-calendar-alt"></i> Actividades Programadas</a></li>
 
       <li style="margin-top: 30px;">
-        <a href="/logout" style="background: #dc2626; color: white;"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a>
+        <a href="/logout" style="background: #dc2626; color: white;">
+          <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+        </a>
       </li>
     </ul>
   </nav>
@@ -47,33 +58,39 @@
   <main class="content">
     <header class="top-bar">
       <h1>Panel de Control Principal</h1>
-      <div class="user-info"><span>Administrador: <strong>Master Control</strong></span></div>
+      <div class="user-info">
+        <span>Bienvenido: <strong th:text="${#authentication.name}">Admin</strong></span>
+      </div>
     </header>
 
     <div class="dashboard-grid">
 
       <div class="widget" style="grid-column: span 3; background: linear-gradient(135deg, var(--primary) 0%, #0f172a 100%); color: white; border: none;">
         <i class="fas fa-microchip icon-bg" style="color: rgba(255,255,255,0.05);"></i>
-        <h2 style="margin-top: 0;">Bienvenido al Centro de Operaciones</h2>
+        <h2 style="margin-top: 0;">Centro de Operaciones Epicentral</h2>
         <p style="color: #cbd5e1; max-width: 600px; line-height: 1.6;">
-          Desde aquí podrás monitorear todas las áreas técnicas, operativas y de gestión de la empresa. Selecciona un módulo en el menú lateral para comenzar a trabajar.
+          Gestión técnica de Master Control Engineering. Utilice el menú lateral para navegar entre los módulos de ingeniería, seguridad y talento humano.
         </p>
       </div>
 
       <div class="widget">
-        <h3 style="color: var(--primary); margin-top: 0;"><i class="fas fa-network-wired"></i> Proyectos TICs</h3>
-        <p style="color: #64748b; font-size: 0.9rem;">2 mantenimientos de red programados para esta semana.</p>
+        <h3 style="color: var(--primary); margin-top: 0;"><i class="fas fa-hard-hat"></i> Personal en Campo</h3>
+        <p style="color: #64748b; font-size: 0.9rem;">Monitoreo de asistencia en tiempo real habilitado.</p>
+        <a href="/rrhh/timesheet" style="text-decoration: none; font-size: 0.8rem; color: var(--secondary); font-weight: bold;">Ver Hojas de Tiempo &rarr;</a>
       </div>
 
       <div class="widget">
-        <h3 style="color: var(--primary); margin-top: 0;"><i class="fas fa-fire-alt"></i> Obras GLP</h3>
-        <p style="color: #64748b; font-size: 0.9rem;">Revisión de válvulas pendiente en Granja Palestina.</p>
+        <h3 style="color: var(--primary); margin-top: 0;"><i class="fas fa-calendar-day"></i> Próximos Eventos</h3>
+        <p style="color: #64748b; font-size: 0.9rem;">Revise las capacitaciones y feriados agendados.</p>
+        <a href="/rrhh/calendario" style="text-decoration: none; font-size: 0.8rem; color: var(--secondary); font-weight: bold;">Ver Calendario &rarr;</a>
       </div>
 
       <div class="widget">
-        <h3 style="color: var(--primary); margin-top: 0;"><i class="fas fa-server"></i> Estado Servidor</h3>
-        <p style="color: #16a34a; font-size: 0.9rem; font-weight: bold;"><i class="fas fa-check-circle"></i> Todos los servicios en línea</p>
+        <h3 style="color: var(--primary); margin-top: 0;"><i class="fas fa-shield-virus"></i> Estado del Sistema</h3>
+        <p style="color: #16a34a; font-size: 0.9rem; font-weight: bold;"><i class="fas fa-check-circle"></i> Base de Datos SQLite Conectada</p>
+        <small style="color: #94a3b8;">Ubicación: Valle de los Chillos / Quito</small>
       </div>
+
     </div>
   </main>
 </div>

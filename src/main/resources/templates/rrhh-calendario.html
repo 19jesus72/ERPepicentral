@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Epicentral | Calendario y Actividades</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js'></script>
+
+    <style>
+        /* Ajustes para el calendario */
+        .fc-header-toolbar { margin-bottom: 15px !important; }
+        .fc-toolbar-title { color: var(--primary); font-size: 1.2rem !important; }
+        .fc-button-primary { background-color: var(--secondary) !important; border: none !important; }
+        .fc-event { cursor: pointer; padding: 2px 4px; font-size: 0.8rem; border-radius: 4px; border: none; }
+    </style>
+</head>
+<body>
+<div class="main-wrapper">
+    <nav class="sidebar" th:replace="~{dashboard :: sidebar}"></nav>
+
+    <main class="content">
+        <header class="top-bar">
+            <h1>Agenda de Personal y Actividades</h1>
+            <div class="user-info"><span>Módulo: <strong>Recursos Humanos</strong></span></div>
+        </header>
+
+        <div class="dashboard-grid">
+
+            <div class="widget" style="grid-column: span 1; height: fit-content;">
+                <h3 style="color: var(--primary); margin-top: 0; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;">
+                    <i class="fas fa-calendar-plus"></i> Nueva Actividad
+                </h3>
+                <p style="font-size: 0.8rem; color: #64748b;">Los permisos de los técnicos se sincronizan solos al ser aprobados.</p>
+
+                <form th:action="@{/rrhh/calendario/guardar}" method="post">
+                    <input type="text" name="title" class="input-field" placeholder="Título (Ej: Capacitación GLP)" required style="margin-bottom: 15px;">
+
+                    <select name="activityType" class="input-field" required style="margin-bottom: 15px;">
+                        <option value="Capacitación">Capacitación / Curso</option>
+                        <option value="Feriado">Feriado Nacional</option>
+                        <option value="Reunión">Reunión de Equipo</option>
+                        <option value="Auditoría">Auditoría Externa</option>
+                    </select>
+
+                    <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                        <div style="flex: 1;">
+                            <label style="font-size: 0.8rem; font-weight: bold; color: #475569;">Inicio</label>
+                            <input type="date" name="startDate" class="input-field" required>
+                        </div>
+                        <div style="flex: 1;">
+                            <label style="font-size: 0.8rem; font-weight: bold; color: #475569;">Fin</label>
+                            <input type="date" name="endDate" class="input-field">
+                        </div>
+                    </div>
+
+                    <textarea name="description" class="input-field" rows="2" placeholder="Detalles de la actividad..." required style="margin-bottom: 15px;"></textarea>
+
+                    <button type="submit" class="btn" style="width: 100%; background: var(--primary);">AGENDAR EVENTO</button>
+                </form>
+            </div>
+
+            <div class="widget" style="grid-column: span 2; background: white; padding: 20px; border-top: 5px solid var(--primary);">
+                <div id="calendario-rrhh"></div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script th:inline="javascript">
+    document.addEventListener('DOMContentLoaded', function() {
+        var calendarEl = document.getElementById('calendario-rrhh');
+        var eventosList = [];
+
+        // 1. Cargar Permisos Aprobados (Color Naranja)
+        var permisos = /*[[${permisosAprobados}]]*/ [];
+        permisos.forEach(function(p) {
+            // Sumamos un día a la fecha de fin porque FullCalendar es exclusivo en el límite final
+            var endD = new Date(p.endDate);
+            endD.setDate(endD.getDate() + 1);
+
+            eventosList.push({
+                title: 'Permiso: ' + p.user.firstName + ' ' + p.user.firstSurname,
+                start: p.startDate,
+                end: endD.toISOString().split('T')[0],
+                backgroundColor: '#f59e0b', // Amarillo/Naranja
+                description: p.absenceType + ' - ' + p.reason
+            });
+        });
+
+        // 2. Cargar Actividades de Empresa (Color Azul/Verde)
+        var actividades = /*[[${actividades}]]*/ [];
+        actividades.forEach(function(a) {
+            var endD = new Date(a.endDate);
+            endD.setDate(endD.getDate() + 1);
+
+            var color = a.activityType === 'Feriado' ? '#dc2626' : (a.activityType === 'Capacitación' ? '#16a34a' : '#3b82f6');
+
+            eventosList.push({
+                title: a.title,
+                start: a.startDate,
+                end: endD.toISOString().split('T')[0],
+                backgroundColor: color,
+                description: a.description
+            });
+        });
+
+        // Inicializar FullCalendar
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            locale: 'es', // Español
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek'
+            },
+            events: eventosList,
+            eventClick: function(info) {
+                // Al hacer clic, muestra el detalle
+                alert(info.event.title + "\nDetalle: " + info.event.extendedProps.description);
+            }
+        });
+
+        calendar.render();
+    });
+</script>
+</body>
+</html>
