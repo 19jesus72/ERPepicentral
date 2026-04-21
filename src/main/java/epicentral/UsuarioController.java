@@ -6,16 +6,21 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional; // <--- ¡AQUÍ ESTÁ LA LIBRERÍA QUE FALTABA!
 
 @Controller
 @RequestMapping("/usuarios")
 public class UsuarioController {
 
+    // --- REPOSITORIOS Y SERVICIOS (TODOS ARRIBA) ---
     @Autowired
     private UserService userService;
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private LogRepository logRepository;
 
     // 1. PANTALLA DE CREACIÓN
     @GetMapping("/crear")
@@ -88,10 +93,7 @@ public class UsuarioController {
         return "redirect:/usuarios/actualizar?eliminado";
     }
 
-    // 5. OTROS APARTADOS
-    // En UsuarioController.java
-
-    // 1. Cargar la pantalla de permisos para un usuario específico
+    // 5. GESTIÓN DE PERMISOS
     @GetMapping("/permisos/{id}")
     public String gestionarPermisos(@PathVariable("id") Long id, Model model) {
         User user = userRepository.findById(id)
@@ -105,7 +107,6 @@ public class UsuarioController {
         return "usuarios-permisos";
     }
 
-    // 2. Guardar la selección de módulos
     @PostMapping("/permisos/guardar")
     public String guardarPermisos(@RequestParam("userId") Long userId,
                                   @RequestParam(value = "modulos", required = false) List<String> modulos) {
@@ -115,16 +116,10 @@ public class UsuarioController {
         user.setFunctionalities(modulos != null ? modulos : new java.util.ArrayList<>());
 
         userRepository.save(user);
-
-        // Registrar la acción en los logs (opcional, si ya integraste LogRepository)
-        // logRepository.save(new LogEntry("admin@epicentral.com", "PERMISOS", "Se actualizaron accesos para: " + user.getEmail()));
-
         return "redirect:/usuarios/actualizar?permisos_actualizados";
     }
 
-    @Autowired
-    private LogRepository logRepository;
-
+    // 6. LOGS DE AUDITORÍA
     @GetMapping("/logs")
     public String verLogs(Model model) {
         // Obtenemos todos los eventos, del más reciente al más antiguo
@@ -135,7 +130,6 @@ public class UsuarioController {
     // ---------------------------------------------------------
     // MÓDULO DE RECUPERACIÓN DE CONTRASEÑA
     // ---------------------------------------------------------
-
     @GetMapping("/recuperar-password")
     public String mostrarPantallaRecuperacion() {
         return "recuperar-password";
@@ -145,16 +139,9 @@ public class UsuarioController {
     public String procesarRecuperacion(@RequestParam("email") String email, Model model) {
         Optional<User> user = userRepository.findByEmail(email);
 
-        // Ciberseguridad: Siempre mostramos el mismo mensaje aunque el correo no exista.
-        // Esto evita que atacantes adivinen qué correos están registrados en Master Control.
         model.addAttribute("exito", "Si el correo está registrado, hemos enviado un enlace para restablecer su contraseña.");
 
         if (user.isPresent()) {
-            // NOTA PARA LA FASE DE PRODUCCIÓN:
-            // Para enviar correos reales, integraremos 'spring-boot-starter-mail'
-            // y configuraremos un SMTP (ej: un App Password de Gmail).
-
-            // Por ahora, simulamos el envío en la consola para no bloquear el desarrollo:
             System.out.println("=======================================================");
             System.out.println("SISTEMA DE CORREO SIMULADO: RESTABLECER CONTRASEÑA");
             System.out.println("Destinatario: " + email);
