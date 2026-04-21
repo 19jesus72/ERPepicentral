@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Epicentral | Libro Diario</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+    <style>
+        .account-select { width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #cbd5e1; }
+        .amount-input { width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #cbd5e1; text-align: right; }
+        .totales-bar { background: #f8fafc; padding: 15px; border-radius: 8px; display: flex; justify-content: space-between; font-weight: bold; margin-top: 10px; border: 2px solid #e2e8f0; }
+        .descuadrado { border-color: #dc2626 !important; background: #fee2e2 !important; color: #b91c1c; }
+        .cuadrado { border-color: #16a34a !important; background: #dcfce7 !important; color: #166534; }
+    </style>
+</head>
+<body>
+<div class="main-wrapper">
+    <nav class="sidebar" th:replace="~{dashboard :: sidebar}"></nav>
+
+    <main class="content">
+        <header class="top-bar">
+            <h1>Libro Diario y Asientos Contables</h1>
+            <div class="user-info"><span>Módulo: <strong>Contabilidad y Finanzas</strong></span></div>
+        </header>
+
+        <div class="dashboard-grid">
+
+            <div class="widget" style="grid-column: span 3; border-top: 5px solid var(--secondary);">
+                <h3 style="color: var(--primary); margin-top: 0; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;">
+                    <i class="fas fa-book-open"></i> Registrar Nueva Transacción (Partida Doble)
+                </h3>
+
+                <form th:action="@{/contabilidad/diario/guardar}" method="post" id="formAsiento">
+
+                    <div style="display: flex; gap: 15px; margin-bottom: 15px;">
+                        <div style="flex: 1;">
+                            <label style="font-size: 0.8rem; font-weight: bold; color: #475569;">Fecha</label>
+                            <input type="date" name="entryDate" class="input-field" th:value="${#temporals.format(#temporals.createNow(), 'yyyy-MM-dd')}" required>
+                        </div>
+                        <div style="flex: 2;">
+                            <label style="font-size: 0.8rem; font-weight: bold; color: #475569;">Documento Referencia</label>
+                            <input type="text" name="referenceDocument" class="input-field" placeholder="Ej: Factura #001-002, Transf. #445" required>
+                        </div>
+                    </div>
+                    <div style="margin-bottom: 20px;">
+                        <label style="font-size: 0.8rem; font-weight: bold; color: #475569;">Glosa / Concepto General</label>
+                        <input type="text" name="description" class="input-field" placeholder="Ej: Registro por cobro de instalación GLP en Granja Palestina" required>
+                    </div>
+
+                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 10px;" id="tablaLineas">
+                        <thead>
+                        <tr style="background: #1e293b; color: white; text-align: left;">
+                            <th style="padding: 10px; border-radius: 4px 0 0 0; width: 60%;">Cuenta Contable</th>
+                            <th style="padding: 10px; width: 20%;">DEBE ($)</th>
+                            <th style="padding: 10px; border-radius: 0 4px 0 0; width: 20%;">HABER ($)</th>
+                        </tr>
+                        </thead>
+                        <tbody id="lineasBody">
+                        <tr class="fila-asiento">
+                            <td style="padding: 5px;">
+                                <select name="accountIds" class="account-select" required>
+                                    <option value="" disabled selected>-- Seleccione Cuenta --</option>
+                                    <option th:each="c : ${cuentas}" th:value="${c.id}" th:text="${c.code + ' - ' + c.name}"></option>
+                                </select>
+                            </td>
+                            <td style="padding: 5px;"><input type="number" step="0.01" name="debits" value="0" class="amount-input debit-input" onkeyup="calcularTotales()" onchange="calcularTotales()"></td>
+                            <td style="padding: 5px;"><input type="number" step="0.01" name="credits" value="0" class="amount-input credit-input" onkeyup="calcularTotales()" onchange="calcularTotales()"></td>
+                        </tr>
+                        <tr class="fila-asiento">
+                            <td style="padding: 5px;">
+                                <select name="accountIds" class="account-select" required>
+                                    <option value="" disabled selected>-- Seleccione Cuenta --</option>
+                                    <option th:each="c : ${cuentas}" th:value="${c.id}" th:text="${c.code + ' - ' + c.name}"></option>
+                                </select>
+                            </td>
+                            <td style="padding: 5px;"><input type="number" step="0.01" name="debits" value="0" class="amount-input debit-input" onkeyup="calcularTotales()" onchange="calcularTotales()"></td>
+                            <td style="padding: 5px;"><input type="number" step="0.01" name="credits" value="0" class="amount-input credit-input" onkeyup="calcularTotales()" onchange="calcularTotales()"></td>
+                        </tr>
+                        </tbody>
+                    </table>
+
+                    <button type="button" class="btn" style="background: #64748b; padding: 6px 12px; font-size: 0.8rem;" onclick="agregarLinea()">
+                        <i class="fas fa-plus"></i> Añadir otra cuenta
+                    </button>
+
+                    <div id="totalesBar" class="totales-bar descuadrado">
+                        <span>TOTALES:</span>
+                        <span style="flex: 1; text-align: right; padding-right: 20px;">Debe: $<span id="totalDebe">0.00</span></span>
+                        <span style="width: 20%; text-align: right;">Haber: $<span id="totalHaber">0.00</span></span>
+                    </div>
+                    <div id="mensajeError" style="color: #dc2626; font-size: 0.85rem; font-weight: bold; text-align: right; margin-top: 5px;">
+                        <i class="fas fa-exclamation-triangle"></i> El asiento está descuadrado. El Debe y el Haber deben ser iguales.
+                    </div>
+
+                    <button type="submit" id="btnGuardar" class="btn" style="width: 100%; margin-top: 15px; background: var(--secondary);" disabled>
+                        <i class="fas fa-save"></i> CONTABILIZAR ASIENTO
+                    </button>
+                </form>
+            </div>
+
+            <div class="widget" style="grid-column: span 3;">
+                <h3 style="color: var(--primary); margin-top: 0; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;">
+                    <i class="fas fa-history"></i> Historial de Movimientos (Libro Diario)
+                </h3>
+
+                <div th:each="asiento : ${asientos}" style="background: white; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 15px; overflow: hidden;">
+                    <div style="background: #f8fafc; padding: 12px 15px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <strong style="color: #1e3a8a; font-size: 1.1rem;">Asiento #<span th:text="${asiento.id}"></span></strong>
+                            <span style="margin-left: 15px; color: #64748b;"><i class="fas fa-calendar"></i> <span th:text="${asiento.entryDate}"></span></span>
+                        </div>
+                        <span style="background: #e2e8f0; padding: 4px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; color: #475569;" th:text="${asiento.referenceDocument}"></span>
+                    </div>
+                    <div style="padding: 15px;">
+                        <p style="margin: 0 0 10px 0; color: #475569; font-style: italic;" th:text="${asiento.description}"></p>
+                        <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem;">
+                            <tr th:each="linea : ${asiento.lines}" style="border-bottom: 1px dashed #e2e8f0;">
+                                <td style="padding: 5px 0; width: 60%;"><span th:text="${linea.account.code}"></span> - <strong th:text="${linea.account.name}"></strong></td>
+                                <td style="padding: 5px 0; width: 20%; text-align: right; color: #16a34a; font-family: monospace;" th:text="${linea.debit > 0 ? '$'+linea.debit : ''}"></td>
+                                <td style="padding: 5px 0; width: 20%; text-align: right; color: #dc2626; font-family: monospace;" th:text="${linea.credit > 0 ? '$'+linea.credit : ''}"></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+
+                <div th:if="${#lists.isEmpty(asientos)}" style="text-align: center; color: #94a3b8; padding: 30px;">
+                    No existen movimientos contables registrados.
+                </div>
+            </div>
+
+        </div>
+    </main>
+</div>
+
+<script>
+    function agregarLinea() {
+        const tbody = document.getElementById('lineasBody');
+        const primeraFila = tbody.querySelector('.fila-asiento');
+        const nuevaFila = primeraFila.cloneNode(true);
+
+        // Limpiamos los valores de la nueva fila
+        nuevaFila.querySelector('select').selectedIndex = 0;
+        nuevaFila.querySelector('.debit-input').value = 0;
+        nuevaFila.querySelector('.credit-input').value = 0;
+
+        tbody.appendChild(nuevaFila);
+    }
+
+    function calcularTotales() {
+        let totalDebe = 0;
+        let totalHaber = 0;
+
+        document.querySelectorAll('.debit-input').forEach(input => {
+            totalDebe += parseFloat(input.value) || 0;
+        });
+        document.querySelectorAll('.credit-input').forEach(input => {
+            totalHaber += parseFloat(input.value) || 0;
+        });
+
+        document.getElementById('totalDebe').innerText = totalDebe.toFixed(2);
+        document.getElementById('totalHaber').innerText = totalHaber.toFixed(2);
+
+        const totalesBar = document.getElementById('totalesBar');
+        const btnGuardar = document.getElementById('btnGuardar');
+        const mensajeError = document.getElementById('mensajeError');
+
+        // Validación de Partida Doble (Cuadre exacto y mayor a cero)
+        if (totalDebe === totalHaber && totalDebe > 0) {
+            totalesBar.classList.remove('descuadrado');
+            totalesBar.classList.add('cuadrado');
+            btnGuardar.disabled = false;
+            mensajeError.style.display = 'none';
+        } else {
+            totalesBar.classList.remove('cuadrado');
+            totalesBar.classList.add('descuadrado');
+            btnGuardar.disabled = true;
+            mensajeError.style.display = 'block';
+        }
+    }
+
+    // Ejecutar validación al cargar la página
+    calcularTotales();
+</script>
+</body>
+</html>

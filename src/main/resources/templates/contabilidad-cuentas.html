@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Epicentral | Catálogo de Cuentas</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+</head>
+<body>
+<div class="main-wrapper">
+    <nav class="sidebar" th:replace="~{dashboard :: sidebar}"></nav>
+
+    <main class="content">
+        <header class="top-bar">
+            <h1>Catálogo y Conceptos Contables</h1>
+            <div class="user-info"><span>Módulo: <strong>Contabilidad y Finanzas</strong></span></div>
+        </header>
+
+        <div th:if="${param.exito}" style="background: #dcfce7; color: #166534; padding: 10px; border-radius: 8px; margin-bottom: 15px; font-size: 0.9rem; font-weight: bold;">
+            <i class="fas fa-check-circle"></i> Cuenta guardada correctamente.
+        </div>
+        <div th:if="${param.error_uso}" style="background: #fee2e2; color: #b91c1c; padding: 10px; border-radius: 8px; margin-bottom: 15px; font-size: 0.9rem; font-weight: bold;">
+            <i class="fas fa-exclamation-triangle"></i> No se puede eliminar esta cuenta porque ya tiene transacciones registradas en el Libro Diario.
+        </div>
+
+        <div class="dashboard-grid">
+
+            <div class="widget" style="grid-column: span 1; height: fit-content; border-top: 5px solid var(--primary);">
+                <h3 id="formTitle" style="color: var(--primary); margin-top: 0; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;">
+                    <i class="fas fa-plus-circle"></i> Nueva Cuenta
+                </h3>
+
+                <form th:action="@{/contabilidad/cuentas/guardar}" th:object="${nuevaCuenta}" method="post" id="cuentaForm">
+                    <input type="hidden" id="id" name="id">
+
+                    <div style="margin-bottom: 15px;">
+                        <label style="font-size: 0.8rem; font-weight: bold; color: #475569;">Código Contable</label>
+                        <input type="text" id="code" name="code" class="input-field" placeholder="Ej: 1.1.1.02" required>
+                        <small style="color: #94a3b8;">Siga la estructura de su plan de cuentas.</small>
+                    </div>
+
+                    <div style="margin-bottom: 15px;">
+                        <label style="font-size: 0.8rem; font-weight: bold; color: #475569;">Nombre del Concepto / Cuenta</label>
+                        <input type="text" id="name" name="name" class="input-field" placeholder="Ej: Banco Guayaquil" required>
+                    </div>
+
+                    <div style="margin-bottom: 15px;">
+                        <label style="font-size: 0.8rem; font-weight: bold; color: #475569;">Naturaleza / Tipo</label>
+                        <select id="type" name="type" class="input-field" required>
+                            <option value="" disabled selected>-- Seleccione Tipo --</option>
+                            <option value="ACTIVO">ACTIVO (Bienes y Derechos)</option>
+                            <option value="PASIVO">PASIVO (Deudas y Obligaciones)</option>
+                            <option value="PATRIMONIO">PATRIMONIO (Capital)</option>
+                            <option value="INGRESO">INGRESO (Ventas y Ganancias)</option>
+                            <option value="GASTO">GASTO (Costos y Egresos)</option>
+                        </select>
+                    </div>
+
+                    <div style="margin-bottom: 15px;">
+                        <label style="font-size: 0.8rem; font-weight: bold; color: #475569;">Descripción Breve</label>
+                        <textarea id="description" name="description" class="input-field" rows="2" placeholder="Uso principal de esta cuenta..."></textarea>
+                    </div>
+
+                    <div style="display: flex; gap: 10px;">
+                        <button type="submit" class="btn" style="flex: 1; background: var(--secondary);">
+                            <i class="fas fa-save"></i> GUARDAR
+                        </button>
+                        <button type="button" class="btn" style="background: #e2e8f0; color: #475569;" onclick="limpiarFormulario()" title="Limpiar Formulario">
+                            <i class="fas fa-eraser"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="widget" style="grid-column: span 2;">
+                <h3 style="color: var(--primary); margin-top: 0; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;">
+                    <i class="fas fa-list-ul"></i> Plan de Cuentas Actual
+                </h3>
+
+                <table style="width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 0.9rem;">
+                    <thead>
+                    <tr style="text-align: left; border-bottom: 2px solid #e2e8f0; color: #64748b; background: #f8fafc;">
+                        <th style="padding: 10px;">CÓDIGO</th>
+                        <th style="padding: 10px;">NOMBRE Y DETALLE</th>
+                        <th style="padding: 10px;">NATURALEZA</th>
+                        <th style="padding: 10px; text-align: center;">ACCIONES</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="c : ${cuentas}" style="border-bottom: 1px solid #f1f5f9;">
+                        <td style="padding: 10px; font-family: monospace; font-weight: bold; color: #475569;" th:text="${c.code}"></td>
+                        <td style="padding: 10px;">
+                            <strong style="color: #1e3a8a; display: block;" th:text="${c.name}"></strong>
+                            <small style="color: #94a3b8;" th:text="${c.description}"></small>
+                        </td>
+                        <td style="padding: 10px;">
+                            <span th:if="${c.type == 'ACTIVO'}" style="background: #dcfce7; color: #166534; padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold;">ACTIVO</span>
+                            <span th:if="${c.type == 'PASIVO'}" style="background: #fee2e2; color: #b91c1c; padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold;">PASIVO</span>
+                            <span th:if="${c.type == 'PATRIMONIO'}" style="background: #f3e8ff; color: #6b21a8; padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold;">PATRIMONIO</span>
+                            <span th:if="${c.type == 'INGRESO'}" style="background: #dbeafe; color: #1e40af; padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold;">INGRESO</span>
+                            <span th:if="${c.type == 'GASTO'}" style="background: #ffedd5; color: #b45309; padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold;">GASTO</span>
+                        </td>
+                        <td style="padding: 10px; display: flex; gap: 5px; justify-content: center;">
+                            <button class="btn" style="padding: 5px 10px; background: #eab308; color: black; font-size: 0.75rem;"
+                                    th:onclick="cargarParaEditar([[${c.id}]], [[${c.code}]], [[${c.name}]], [[${c.type}]], [[${c.description}]])" title="Editar">
+                                <i class="fas fa-edit"></i>
+                            </button>
+
+                            <form th:action="@{/contabilidad/cuentas/eliminar}" method="post" onsubmit="return confirm('¿Seguro que desea eliminar esta cuenta?');">
+                                <input type="hidden" name="cuentaId" th:value="${c.id}">
+                                <button type="submit" class="btn" style="padding: 5px 10px; background: #dc2626; font-size: 0.75rem;" title="Eliminar">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script>
+    function cargarParaEditar(id, code, name, type, description) {
+        document.getElementById('formTitle').innerHTML = '<i class="fas fa-pen"></i> Editar Cuenta';
+        document.getElementById('id').value = id;
+        document.getElementById('code').value = code;
+        document.getElementById('name').value = name;
+        document.getElementById('type').value = type;
+        document.getElementById('description').value = description;
+
+        // Scroll hacia arriba para ver el formulario
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function limpiarFormulario() {
+        document.getElementById('formTitle').innerHTML = '<i class="fas fa-plus-circle"></i> Nueva Cuenta';
+        document.getElementById('id').value = '';
+        document.getElementById('cuentaForm').reset();
+    }
+</script>
+</body>
+</html>

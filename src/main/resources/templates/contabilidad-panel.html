@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Epicentral | Panel Contable</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+</head>
+<body>
+<div class="main-wrapper">
+    <nav class="sidebar" th:replace="~{dashboard :: sidebar}"></nav>
+
+    <main class="content">
+        <header class="top-bar">
+            <h1>Panel General de Finanzas</h1>
+            <div class="user-info"><span>Administración Central</span></div>
+        </header>
+
+        <div class="dashboard-grid">
+
+            <div class="widget" style="grid-column: span 3; display: flex; gap: 15px; background: none; box-shadow: none; padding: 0;">
+                <a href="/contabilidad/diario" class="btn" style="flex: 1; padding: 20px; background: var(--primary); text-decoration: none; text-align: center;">
+                    <i class="fas fa-book" style="font-size: 1.5rem; display: block; margin-bottom: 10px;"></i> Libro Diario
+                </a>
+                <a href="/contabilidad/facturas" class="btn" style="flex: 1; padding: 20px; background: #16a34a; text-decoration: none; text-align: center;">
+                    <i class="fas fa-file-invoice" style="font-size: 1.5rem; display: block; margin-bottom: 10px;"></i> Facturación
+                </a>
+                <a href="/contabilidad/gastos" class="btn" style="flex: 1; padding: 20px; background: #f59e0b; text-decoration: none; text-align: center; color: black;">
+                    <i class="fas fa-shopping-cart" style="font-size: 1.5rem; display: block; margin-bottom: 10px;"></i> Gastos
+                </a>
+                <a href="/contabilidad/reportes" class="btn" style="flex: 1; padding: 20px; background: #6366f1; text-decoration: none; text-align: center;">
+                    <i class="fas fa-chart-pie" style="font-size: 1.5rem; display: block; margin-bottom: 10px;"></i> P&L
+                </a>
+                <a href="/contabilidad/cuentas" class="btn" style="flex: 1; padding: 20px; background: #64748b; text-decoration: none; text-align: center;">
+                    <i class="fas fa-sitemap" style="font-size: 1.5rem; display: block; margin-bottom: 10px;"></i> Catálogo
+                </a>
+            </div>
+
+            <div class="widget" style="grid-column: span 3;">
+                <h3 style="color: var(--primary); margin-top: 0; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;">
+                    <i class="fas fa-shield-alt"></i> Auditoría: Últimos 100 Registros Bancarios/Diarios
+                </h3>
+
+                <table style="width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 0.85rem;">
+                    <thead>
+                    <tr style="text-align: left; background: #f8fafc; color: #64748b; border-bottom: 2px solid #e2e8f0;">
+                        <th style="padding: 12px;">FECHA/HORA REGISTRO</th>
+                        <th style="padding: 12px;">USUARIO RESPONSABLE</th>
+                        <th style="padding: 12px;">CONCEPTO / REFERENCIA</th>
+                        <th style="padding: 12px; text-align: right;">VALOR TOTAL</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="r : ${ultimosRegistros}" style="border-bottom: 1px solid #f1f5f9;">
+                        <td style="padding: 12px;">
+                            <strong th:text="${#temporals.format(r.createdAt, 'dd/MM/yyyy HH:mm')}"></strong>
+                        </td>
+                        <td style="padding: 12px;">
+                                    <span style="background: #e0f2fe; color: #0369a1; padding: 3px 8px; border-radius: 4px; font-weight: bold;">
+                                        <i class="fas fa-user-edit"></i> <span th:text="${r.createdBy.firstName + ' ' + r.createdBy.firstSurname}"></span>
+                                    </span>
+                        </td>
+                        <td style="padding: 12px;">
+                            <strong th:text="${r.description}"></strong><br>
+                            <small style="color: #94a3b8;" th:text="${'Ref: ' + r.referenceDocument}"></small>
+                        </td>
+                        <td style="padding: 12px; text-align: right; font-weight: bold; color: #16a34a;">
+                            $<span th:text="${#numbers.formatDecimal(#aggregator.sum(r.lines.![debit]), 1, 2)}"></span>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(ultimosRegistros)}">
+                        <td colspan="4" style="padding: 30px; text-align: center; color: #94a3b8;">No se han encontrado registros contables recientes.</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </main>
+</div>
+</body>
+</html>
