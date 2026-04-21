@@ -21,23 +21,31 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/css/**", "/registro").permitAll() // Puerta abierta para estilos y registro
+                        // PERMITIMOS EL ACCESO A LA PANTALLA DE RECUPERACIÓN SIN LOGIN
+                        .requestMatchers("/css/**", "/js/**", "/img/**", "/login", "/recuperar-password", "/recuperar-password/enviar").permitAll()
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
                         .loginPage("/login")
-                        .defaultSuccessUrl("/", true) // Esto te manda directo al inicio tras el login
+                        .defaultSuccessUrl("/", true)
                         .permitAll()
                 )
+                // CONFIGURACIÓN DEL ACCESO POR 30 DÍAS
                 .rememberMe(remember -> remember
-                        .key("EpicentralSecretKey_2026") // Llave única para cifrar la cookie
-                        .tokenValiditySeconds(2592000)  // Válido por 30 días (60*60*24*30)
-                        .userDetailsService(userDetailsService)
+                        .key("EpicentralMasterControlKey2026") // Llave secreta para encriptar la cookie
+                        .tokenValiditySeconds(2592000) // 30 días en segundos (30 * 24 * 60 * 60)
+                        .rememberMeParameter("remember-me") // El nombre del checkbox en el HTML
                 )
-                .logout(logout -> logout.permitAll());
+                .logout(logout -> logout
+                        .logoutUrl("/logout")
+                        .logoutSuccessUrl("/login?logout")
+                        .permitAll()
+                )
+                .csrf(csrf -> csrf.disable()); // Mantener deshabilitado si usas H2/SQLite local para evitar bloqueos
+
         return http.build();
     }
 }

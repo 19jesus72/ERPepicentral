@@ -132,7 +132,36 @@ public class UsuarioController {
         return "usuarios-logs";
     }
 
-    // Ejemplo de cómo registrar una eliminación (haz algo similar en guardar y actualizar)
-    // En UsuarioController.java
+    // ---------------------------------------------------------
+    // MÓDULO DE RECUPERACIÓN DE CONTRASEÑA
+    // ---------------------------------------------------------
 
+    @GetMapping("/recuperar-password")
+    public String mostrarPantallaRecuperacion() {
+        return "recuperar-password";
+    }
+
+    @PostMapping("/recuperar-password/enviar")
+    public String procesarRecuperacion(@RequestParam("email") String email, Model model) {
+        Optional<User> user = userRepository.findByEmail(email);
+
+        // Ciberseguridad: Siempre mostramos el mismo mensaje aunque el correo no exista.
+        // Esto evita que atacantes adivinen qué correos están registrados en Master Control.
+        model.addAttribute("exito", "Si el correo está registrado, hemos enviado un enlace para restablecer su contraseña.");
+
+        if (user.isPresent()) {
+            // NOTA PARA LA FASE DE PRODUCCIÓN:
+            // Para enviar correos reales, integraremos 'spring-boot-starter-mail'
+            // y configuraremos un SMTP (ej: un App Password de Gmail).
+
+            // Por ahora, simulamos el envío en la consola para no bloquear el desarrollo:
+            System.out.println("=======================================================");
+            System.out.println("SISTEMA DE CORREO SIMULADO: RESTABLECER CONTRASEÑA");
+            System.out.println("Destinatario: " + email);
+            System.out.println("Enlace: http://localhost:8080/reset?token=" + java.util.UUID.randomUUID().toString());
+            System.out.println("=======================================================");
+        }
+
+        return "recuperar-password";
+    }
 }

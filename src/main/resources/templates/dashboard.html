@@ -59,7 +59,7 @@
     <header class="top-bar">
       <h1>Panel de Control Principal</h1>
       <div class="user-info">
-        <span>Bienvenido: <strong th:text="${#authentication.name}">Admin</strong></span>
+        <span>Bienvenido: <strong th:text="${#request.userPrincipal != null ? #request.userPrincipal.name : 'Master Control'}">Admin</strong></span>
       </div>
     </header>
 
