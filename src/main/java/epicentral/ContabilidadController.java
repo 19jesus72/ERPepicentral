@@ -51,7 +51,8 @@ public class ContabilidadController {
                                  @RequestParam("referenceDocument") String referenceDocument,
                                  @RequestParam("accountIds") List<Long> accountIds,
                                  @RequestParam("debits") List<Double> debits,
-                                 @RequestParam("credits") List<Double> credits) {
+                                 @RequestParam("credits") List<Double> credits,
+                                 java.security.Principal principal) { // <--- Asegúrate de que solo quede el que tiene esta línea
 
         JournalEntry asiento = new JournalEntry();
         asiento.setEntryDate(entryDate);
@@ -59,24 +60,24 @@ public class ContabilidadController {
         asiento.setReferenceDocument(referenceDocument);
         asiento.setStatus("REGISTRADO");
 
-        // Recorremos las listas de líneas que envía el formulario HTML
+        // AUDITORÍA: Capturamos momento real y usuario
+        asiento.setCreatedAt(java.time.LocalDateTime.now());
+        User userLogueado = userRepository.findByEmail(principal.getName()).get();
+        asiento.setCreatedBy(userLogueado);
+
         for (int i = 0; i < accountIds.size(); i++) {
             Double deb = debits.get(i);
             Double cred = credits.get(i);
-
-            // Solo guardamos la línea si tiene algún valor en Debe o Haber
             if (deb > 0 || cred > 0) {
                 JournalLine linea = new JournalLine();
                 linea.setAccount(accountRepository.findById(accountIds.get(i)).get());
-                linea.setDebit(deb != null ? deb : 0.0);
-                linea.setCredit(cred != null ? cred : 0.0);
-
-                asiento.addLine(linea); // Este método conecta la línea con el asiento maestro
+                linea.setDebit(deb);
+                linea.setCredit(cred);
+                asiento.addLine(linea);
             }
         }
-
         journalRepository.save(asiento);
-        return "redirect:/contabilidad/diario?exito";
+        return "redirect:/contabilidad/panel?exito";
     }
     // ---------------------------------------------------------
     // MÓDULO DE FACTURACIÓN Y CUENTAS POR COBRAR
@@ -250,41 +251,5 @@ public class ContabilidadController {
         model.addAttribute("balanceRapido", ingresos - gastos);
 
         return "contabilidad-panel";
-    }
-
-    // ACTUALIZACIÓN: Modifica tu método guardarAsiento actual para incluir esto:
-    @PostMapping("/diario/guardar")
-    public String guardarAsiento(@RequestParam("entryDate") LocalDate entryDate,
-                                 @RequestParam("description") String description,
-                                 @RequestParam("referenceDocument") String referenceDocument,
-                                 @RequestParam("accountIds") List<Long> accountIds,
-                                 @RequestParam("debits") List<Double> debits,
-                                 @RequestParam("credits") List<Double> credits,
-                                 java.security.Principal principal) { // <--- Agregamos Principal
-
-        JournalEntry asiento = new JournalEntry();
-        asiento.setEntryDate(entryDate);
-        asiento.setDescription(description);
-        asiento.setReferenceDocument(referenceDocument);
-        asiento.setStatus("REGISTRADO");
-
-        // AUDITORÍA: Capturamos momento real y usuario
-        asiento.setCreatedAt(java.time.LocalDateTime.now());
-        User userLogueado = userRepository.findByEmail(principal.getName()).get();
-        asiento.setCreatedBy(userLogueado);
-
-        for (int i = 0; i < accountIds.size(); i++) {
-            Double deb = debits.get(i);
-            Double cred = credits.get(i);
-            if (deb > 0 || cred > 0) {
-                JournalLine linea = new JournalLine();
-                linea.setAccount(accountRepository.findById(accountIds.get(i)).get());
-                linea.setDebit(deb);
-                linea.setCredit(cred);
-                asiento.addLine(linea);
-            }
-        }
-        journalRepository.save(asiento);
-        return "redirect:/contabilidad/panel?exito"; // Redirigimos al panel ahora
     }
 }
