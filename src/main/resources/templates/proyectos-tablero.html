@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Epicentral | Kanban</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+    <style>
+        .kanban-board { display: flex; gap: 20px; overflow-x: auto; padding-top: 10px; }
+        .kanban-column { flex: 1; min-width: 300px; background: #f1f5f9; border-radius: 8px; padding: 15px; }
+        .kanban-header { font-weight: bold; text-transform: uppercase; color: #475569; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid #cbd5e1; }
+        .task-card { background: white; padding: 15px; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); margin-bottom: 15px; border-left: 4px solid #cbd5e1; }
+        .task-card.alta { border-left-color: #f59e0b; }
+        .task-card.urgente { border-left-color: #dc2626; }
+    </style>
+</head>
+<body>
+<div class="main-wrapper">
+    <nav class="sidebar" th:replace="~{dashboard :: sidebar}"></nav>
+    <main class="content">
+        <header class="top-bar">
+            <h1>Tablero de Tareas: <span th:text="${proyecto.name}"></span></h1>
+            <div class="user-info"><a href="/proyectos/portafolio" style="color: var(--secondary); text-decoration: none;"><i class="fas fa-arrow-left"></i> Volver</a></div>
+        </header>
+
+        <div class="kanban-board">
+            <div class="kanban-column" style="background: white; border: 1px dashed #cbd5e1;">
+                <div class="kanban-header" style="color: #3b82f6;"><i class="fas fa-plus"></i> Nueva Tarea</div>
+                <form th:action="@{/proyectos/tareas/guardar}" th:object="${nuevaTarea}" method="post">
+                    <input type="hidden" name="projectId" th:value="${proyecto.id}">
+                    <input type="text" th:field="*{title}" class="input-field" placeholder="¿Qué hay que hacer?" required style="margin-bottom: 10px;">
+
+                    <select name="assignedToId" class="input-field" required style="margin-bottom: 10px;">
+                        <option value="" disabled selected>-- Asignar a... --</option>
+                        <option th:each="user : ${usuarios}" th:value="${user.id}" th:text="${user.firstName + ' ' + user.firstSurname}"></option>
+                    </select>
+
+                    <div style="display: flex; gap: 5px; margin-bottom: 10px;">
+                        <select th:field="*{priority}" class="input-field" style="flex: 1;" required>
+                            <option value="BAJA">Baja</option>
+                            <option value="MEDIA">Media</option>
+                            <option value="ALTA">Alta</option>
+                            <option value="URGENTE">Urgente!</option>
+                        </select>
+                        <input type="date" th:field="*{dueDate}" class="input-field" style="flex: 1;" required title="Límite">
+                    </div>
+
+                    <button type="submit" class="btn" style="width: 100%; background: #3b82f6;">AGREGAR TAREA</button>
+                </form>
+            </div>
+
+            <div class="kanban-column">
+                <div class="kanban-header">PENDIENTES (To-Do)</div>
+                <div th:each="t : ${proyecto.tasks}" th:if="${t.status == 'PENDIENTE'}" th:class="'task-card ' + ${#strings.toLowerCase(t.priority)}">
+                    <h4 style="margin: 0 0 5px 0; color: #1e3a8a;" th:text="${t.title}"></h4>
+                    <div style="font-size: 0.8rem; color: #64748b; margin-bottom: 10px;">
+                        <i class="fas fa-user"></i> <span th:text="${t.assignedTo.firstName}"></span> | <i class="fas fa-clock"></i> <span th:text="${t.dueDate}"></span>
+                    </div>
+                    <form th:action="@{/proyectos/tareas/estado}" method="post">
+                        <input type="hidden" name="taskId" th:value="${t.id}">
+                        <input type="hidden" name="projectId" th:value="${proyecto.id}">
+                        <input type="hidden" name="nuevoEstado" value="EN_PROGRESO">
+                        <button type="submit" class="btn" style="width: 100%; padding: 4px; font-size: 0.75rem; background: #eab308; color: black;">EMPEZAR &rarr;</button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="kanban-column">
+                <div class="kanban-header">EN PROGRESO</div>
+                <div th:each="t : ${proyecto.tasks}" th:if="${t.status == 'EN_PROGRESO'}" th:class="'task-card ' + ${#strings.toLowerCase(t.priority)}">
+                    <h4 style="margin: 0 0 5px 0; color: #1e3a8a;" th:text="${t.title}"></h4>
+                    <div style="font-size: 0.8rem; color: #64748b; margin-bottom: 10px;">
+                        <i class="fas fa-user"></i> <span th:text="${t.assignedTo.firstName}"></span>
+                    </div>
+                    <form th:action="@{/proyectos/tareas/estado}" method="post">
+                        <input type="hidden" name="taskId" th:value="${t.id}">
+                        <input type="hidden" name="projectId" th:value="${proyecto.id}">
+                        <input type="hidden" name="nuevoEstado" value="COMPLETADO">
+                        <button type="submit" class="btn" style="width: 100%; padding: 4px; font-size: 0.75rem; background: #16a34a;">FINALIZAR &check;</button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="kanban-column">
+                <div class="kanban-header">COMPLETADO</div>
+                <div th:each="t : ${proyecto.tasks}" th:if="${t.status == 'COMPLETADO'}" class="task-card" style="opacity: 0.7; border-left-color: #16a34a;">
+                    <h4 style="margin: 0 0 5px 0; color: #166534; text-decoration: line-through;" th:text="${t.title}"></h4>
+                    <div style="font-size: 0.8rem; color: #64748b;">
+                        Hecho por: <span th:text="${t.assignedTo.firstName}"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+</body>
+</html>
