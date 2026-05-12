@@ -33,6 +33,10 @@ public class InventoryMovement {
     @JoinColumn(name = "created_by_id")
     private User createdBy;
 
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "cost_center_id")
+    private CostCenter costCenter; // Será nulo si es una compra general para bodega
+
     public InventoryMovement() {}
 
     // --- GETTERS Y SETTERS ---
@@ -56,4 +60,7 @@ public class InventoryMovement {
 
     public User getCreatedBy() { return createdBy; }
     public void setCreatedBy(User createdBy) { this.createdBy = createdBy; }
+
+    public CostCenter getCostCenter() { return costCenter; }
+    public void setCostCenter(CostCenter costCenter) { this.costCenter = costCenter; }
 }

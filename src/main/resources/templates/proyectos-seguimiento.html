@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Epicentral | Seguimiento 360°</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+</head>
+<body>
+<div class="main-wrapper">
+    <nav class="sidebar" th:replace="~{dashboard :: sidebar}"></nav>
+    <main class="content">
+        <header class="top-bar">
+            <h1>Seguimiento de Obra: <span th:text="${proyecto.name}"></span></h1>
+            <div class="user-info">
+                    <span style="background: #1e293b; color: white; padding: 5px 10px; border-radius: 4px;">
+                        Centro de Costo: <strong th:text="${proyecto.costCenter != null ? proyecto.costCenter.code : 'Sin asignar'}"></strong>
+                    </span>
+            </div>
+        </header>
+
+        <div class="dashboard-grid">
+            <div class="widget" style="grid-column: span 2; border-top: 5px solid #16a34a;">
+                <h3 style="color: #16a34a;"><i class="fas fa-boxes"></i> Materiales Entregados (Kardex)</h3>
+                <table style="width: 100%; font-size: 0.85rem;">
+                    <tr th:each="m : ${materiales}" style="border-bottom: 1px solid #eee;">
+                        <td style="padding: 8px;" th:text="${#temporals.format(m.movementDate, 'dd/MM/yyyy')}"></td>
+                        <td style="padding: 8px;"><strong th:text="${m.product.name}"></strong></td>
+                        <td style="padding: 8px; text-align: right; font-weight: bold;"
+                            th:text="${(m.movementType == 'DESPACHO' ? '-' : '+') + ' ' + m.quantity}"></td>
+                        <td style="padding: 8px; color: #64748b;" th:text="${m.reference}"></td>
+                    </tr>
+                </table>
+                <p th:if="${#lists.isEmpty(materiales)}" style="text-align: center; color: #94a3b8; padding: 20px;">No se han despachado materiales aún.</p>
+            </div>
+
+            <div class="widget" style="grid-column: span 1; border-top: 5px solid #f59e0b;">
+                <h3 style="color: #b45309;"><i class="fas fa-file-contract"></i> Papeleo y Documentación</h3>
+                <form th:action="@{/proyectos/documentos/guardar}" method="post" style="margin-bottom: 15px;">
+                    <input type="hidden" name="projectId" th:value="${proyecto.id}">
+                    <input type="text" name="name" class="input-field" placeholder="Nombre documento..." required>
+                    <button type="submit" class="btn" style="width:100%; background: #f59e0b; color: black;">+ Añadir Requisito</button>
+                </form>
+                <div th:each="d : ${proyecto.tasks}" style="font-size: 0.85rem; padding: 5px; border-bottom: 1px solid #eee;">
+                    <i class="far fa-square"></i> <span th:text="${d.title}"></span>
+                </div>
+            </div>
+
+            <div class="widget" style="grid-column: span 3; border-top: 5px solid #3b82f6;">
+                <h3><i class="fas fa-stream"></i> Cronograma de Actividades</h3>
+                <div style="display: flex; gap: 10px; padding: 10px; background: #f8fafc; border-radius: 8px;">
+                    <div th:each="t : ${proyecto.tasks}"
+                         style="flex: 1; padding: 10px; background: white; border: 1px solid #e2e8f0; border-radius: 4px; text-align: center;">
+                        <small style="display: block; color: #64748b;" th:text="${t.dueDate}"></small>
+                        <strong th:text="${t.title}"></strong>
+                        <span style="display: block; font-size: 0.7rem; font-weight: bold;"
+                              th:styleappend="${t.status == 'COMPLETADO'} ? 'color: #16a34a' : 'color: #f59e0b'"
+                              th:text="${t.status}"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+</body>
+</html>

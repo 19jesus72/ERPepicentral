@@ -24,6 +24,7 @@ public class Product {
 
     private Double currentStock = 0.0;
     private Double minimumStock = 0.0; // Para alertas de escasez
+    private Double unitCost = 0.0; // Costo unitario de compra
 
     public Product() {}
 
@@ -57,4 +58,7 @@ public class Product {
 
     public Double getMinimumStock() { return minimumStock; }
     public void setMinimumStock(Double minimumStock) { this.minimumStock = minimumStock; }
+
+    public Double getUnitCost() { return unitCost; }
+    public void setUnitCost(Double unitCost) { this.unitCost = unitCost; }
 }

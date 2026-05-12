@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Epicentral | Gantt y Costos</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+    <style>
+        .gantt-container { background: white; padding: 20px; border-radius: 8px; border: 1px solid #e2e8f0; overflow-x: auto; }
+        .gantt-row { display: flex; align-items: center; margin-bottom: 15px; height: 35px; border-bottom: 1px dashed #f1f5f9; }
+        .gantt-label { width: 200px; font-size: 0.85rem; font-weight: bold; color: #475569; overflow: hidden; text-overflow: ellipsis; }
+        .gantt-timeline { flex-grow: 1; position: relative; background: #f8fafc; height: 20px; border-radius: 10px; }
+        .gantt-bar { position: absolute; height: 100%; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.7rem; font-weight: bold; }
+        .finance-box { text-align: center; padding: 20px; border-radius: 8px; border: 2px solid; }
+        .finance-box h2 { margin: 10px 0 0 0; }
+    </style>
+</head>
+<body>
+<div class="main-wrapper">
+    <nav class="sidebar" th:replace="~{dashboard :: sidebar}"></nav>
+    <main class="content">
+        <header class="top-bar">
+            <h1>Análisis de Ejecución y Rentabilidad: <span th:text="${proyecto.name}"></span></h1>
+            <div class="user-info"><a href="/proyectos/portafolio" class="btn btn-sm" style="text-decoration: none;"><i class="fas fa-arrow-left"></i> Volver</a></div>
+        </header>
+
+        <div class="dashboard-grid" style="grid-template-columns: 1fr 1fr 1fr;">
+            <!-- WIDGETS FINANCIEROS -->
+            <div class="finance-box" style="border-color: #3b82f6; color: #1e40af; background: #eff6ff;">
+                <small style="font-weight: bold; text-transform: uppercase;">Presupuesto Obra</small>
+                <h2>$<span th:text="${proyecto.totalBudget}"></span></h2>
+            </div>
+            <div class="finance-box" style="border-color: #ef4444; color: #991b1b; background: #fef2f2;">
+                <small style="font-weight: bold; text-transform: uppercase;">Costo Materiales</small>
+                <h2>$<span th:text="${#numbers.formatDecimal(costoReal, 1, 2)}"></span></h2>
+            </div>
+            <div class="finance-box" style="border-color: #16a34a; color: #166534; background: #f0fdf4;">
+                <small style="font-weight: bold; text-transform: uppercase;">Utilidad Proyectada</small>
+                <h2>$<span th:text="${#numbers.formatDecimal(utilidadEstimada, 1, 2)}"></span></h2>
+            </div>
+
+            <!-- DIAGRAMA DE GANTT -->
+            <div class="widget" style="grid-column: span 3; margin-top: 10px;">
+                <h3 style="color: var(--primary); margin-top: 0; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;"><i class="fas fa-chart-gantt"></i> Cronograma de Actividades</h3>
+                <div class="gantt-container">
+                    <div th:each="t : ${proyecto.tasks}" class="gantt-row">
+                        <div class="gantt-label" th:text="${t.title}"></div>
+                        <div class="gantt-timeline">
+                            <div class="gantt-bar"
+                                 th:style="'width: ' + (${t.status == 'COMPLETADO'} ? '100%' : '50%') + '; left: 0%;' +
+                                               'background: ' + (${t.status == 'COMPLETADO'} ? '#16a34a' : '#3b82f6')"
+                                 th:text="${t.status}">
+                            </div>
+                        </div>
+                        <div style="width: 120px; text-align: right; font-size: 0.75rem; color: #94a3b8; padding-left: 10px;" th:text="${'Vence: ' + t.dueDate}"></div>
+                    </div>
+                    <div th:if="${#lists.isEmpty(proyecto.tasks)}" style="text-align: center; color: #94a3b8; padding: 20px;">
+                        No hay tareas registradas para visualizar en el cronograma.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+</body>
+</html>

@@ -43,6 +43,10 @@ public class Project {
 
     public Project() {}
 
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "cost_center_id")
+    private CostCenter costCenter;
+
     // --- GETTERS Y SETTERS ---
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -64,4 +68,6 @@ public class Project {
     public void setStatus(String status) { this.status = status; }
     public List<ProjectTask> getTasks() { return tasks; }
     public void setTasks(List<ProjectTask> tasks) { this.tasks = tasks; }
+    public CostCenter getCostCenter() { return costCenter; }
+    public void setCostCenter(CostCenter costCenter) { this.costCenter = costCenter; }
 }
