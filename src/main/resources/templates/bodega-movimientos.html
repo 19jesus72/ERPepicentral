@@ -25,44 +25,34 @@
 
         <div class="dashboard-grid">
 
-            <div class="widget" style="grid-column: span 1; height: fit-content; border-top: 5px solid var(--secondary);">
-                <h3 style="color: var(--primary); margin-top: 0; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;">
-                    <i class="fas fa-exchange-alt"></i> Registrar Movimiento
-                </h3>
+            <div class="widget" style="grid-column: span 2;">
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; margin-bottom: 15px;">
+                    <h3 style="color: var(--primary); margin: 0;"><i class="fas fa-history"></i> Reporte de Kardex</h3>
+                    <a href="/bodega/movimientos/exportar" class="btn" style="background: #16a34a; font-size: 0.8rem;">
+                        <i class="fas fa-file-excel"></i> EXPORTAR CSV (EXCEL)
+                    </a>
+                </div>
 
-                <form th:action="@{/bodega/movimientos/registrar}" method="post">
-
-                    <div style="margin-bottom: 15px;">
-                        <label style="font-size: 0.8rem; font-weight: bold; color: #475569;">Material / Equipo</label>
-                        <select name="productId" class="input-field" required>
-                            <option value="" disabled selected>-- Buscar Producto --</option>
-                            <option th:each="p : ${productos}" th:value="${p.id}" th:text="${p.code + ' - ' + p.name + ' (Disp: ' + p.currentStock + ')'}"></option>
+                <form th:action="@{/bodega/movimientos}" method="get" style="display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 10px; margin-bottom: 20px; background: #f8fafc; padding: 15px; border-radius: 8px;">
+                    <div>
+                        <label style="font-size: 0.75rem; font-weight: bold;">Desde:</label>
+                        <input type="date" name="start" class="input-field" style="margin-bottom:0;">
+                    </div>
+                    <div>
+                        <label style="font-size: 0.75rem; font-weight: bold;">Hasta:</label>
+                        <input type="date" name="end" class="input-field" style="margin-bottom:0;">
+                    </div>
+                    <div>
+                        <label style="font-size: 0.75rem; font-weight: bold;">Tipo:</label>
+                        <select name="type" class="input-field" style="margin-bottom:0;">
+                            <option value="TODOS">Todos</option>
+                            <option value="ENTRADA">Entradas</option>
+                            <option value="SALIDA">Salidas</option>
                         </select>
                     </div>
-
-                    <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-                        <div style="flex: 1;">
-                            <label style="font-size: 0.8rem; font-weight: bold; color: #475569;">Tipo de Flujo</label>
-                            <select name="movementType" class="input-field" required>
-                                <option value="ENTRADA">ENTRADA (Compra)</option>
-                                <option value="SALIDA">SALIDA (Instalación)</option>
-                            </select>
-                        </div>
-                        <div style="flex: 1;">
-                            <label style="font-size: 0.8rem; font-weight: bold; color: #475569;">Cantidad</label>
-                            <input type="number" step="0.01" name="quantity" class="input-field" min="0.01" required>
-                        </div>
-                    </div>
-
-                    <div style="margin-bottom: 15px;">
-                        <label style="font-size: 0.8rem; font-weight: bold; color: #475569;">Referencia / Proyecto</label>
-                        <textarea name="reference" class="input-field" rows="2" placeholder="Ej: Usado en Proyecto X, Factura de Compra Y..." required></textarea>
-                    </div>
-
-                    <button type="submit" class="btn" style="width: 100%; background: var(--secondary);">
-                        <i class="fas fa-check"></i> PROCESAR MOVIMIENTO
-                    </button>
+                    <button type="submit" class="btn" style="align-self: end; background: var(--secondary);"><i class="fas fa-filter"></i> FILTRAR</button>
                 </form>
+
             </div>
 
             <div class="widget" style="grid-column: span 2;">

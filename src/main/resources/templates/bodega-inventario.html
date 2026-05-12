@@ -77,7 +77,13 @@
                     </div>
                 </form>
             </div>
-
+            <div style="margin-bottom: 20px; background: white; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                <form th:action="@{/bodega/inventario}" method="get" style="display: flex; gap: 10px;">
+                    <input type="text" name="keyword" th:value="${keyword}" class="input-field" placeholder="Buscar por nombre o código de material..." style="margin-bottom: 0; flex: 1;">
+                    <button type="submit" class="btn" style="background: var(--primary);"><i class="fas fa-search"></i> BUSCAR</button>
+                    <a href="/bodega/inventario" class="btn" style="background: #64748b; text-decoration: none;"><i class="fas fa-sync"></i> LIMPIAR</a>
+                </form>
+            </div>
             <div class="widget" style="grid-column: span 2;">
                 <h3 style="color: var(--primary); margin-top: 0; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;">
                     <i class="fas fa-cubes"></i> Existencias en Bodega Principal
